@@ -42,7 +42,7 @@ class AlienShip {
   int Y;
   int gravity=1;
   char direction='r';
-  int explosionStep;
+  int explosionStep=0;
 
   AlienShip(int x, int y) {
     img = loadImage("graphics/alien-ship.png");      
@@ -71,16 +71,24 @@ class AlienShip {
       img = loadImage("graphics/alien-explosion-1.png");
       explosionStep++;
       break;
-    case 2: 
+    case 2:
       img = loadImage("graphics/alien-explosion-2.png");
       explosionStep++;
       break;
+    case 3:
+      //Wait a cycle
+      explosionStep++;
+      break;
     default:
-      println("defualt");
       img = loadImage("graphics/alien-ship.png"); //Return to default just for now.
       explosionStep=0;
       break;
     }
+  }
+
+  boolean isAlive() {
+    println (explosionStep);
+    return(explosionStep<4);
   }
 
   void draw() {
@@ -158,14 +166,19 @@ void keyReleased() {
 /********* COLLISSIONS *********/
 void detectCollision() {
   int collisionThreshold=5;
-  for (AlienShip alienShip : alienShips) {
-    if (playerBullet !=null) {
-      float distanceX = abs(alienShip.centreX()-playerBullet.centreX());
-      float distanceY = abs(alienShip.centreY()-playerBullet.centreY());
-      if (distanceX< collisionThreshold && distanceY<collisionThreshold) {
-        alienShip.hit();
-      }  
-      //println("diff: "+(alienShip.centreX()-playerBullet.X));
+  if (playerBullet ==null) {
+    return;
+  }
+
+  for (int i = alienShips.size() - 1; i >= 0; i--) {
+    AlienShip alienShip = alienShips.get(i);
+    float distanceX = abs(alienShip.centreX()-playerBullet.centreX());
+    float distanceY = abs(alienShip.centreY()-playerBullet.centreY());
+    if (distanceX< collisionThreshold && distanceY<collisionThreshold) {
+      alienShip.hit();
+    }
+    if (!alienShip.isAlive()) {
+      alienShips.remove(i);
     }
   }
 }
