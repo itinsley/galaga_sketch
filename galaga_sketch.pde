@@ -2,26 +2,70 @@ import ddf.minim.*;
 
 /********* VARIABLES *********/
 int screenSize = 500;
-int playerX = 242;
-int playerY = 483;
-char playerDirection;
+Player player;
 PlayerBullet playerBullet;
 AlienShip alienShip;
 ArrayList<AlienShip> alienShips;
 Minim minim;
-AudioPlayer player;
+AudioPlayer audioPlayer;
+
+
+class Player {
+  PImage img;
+  int X = 242;
+  int Y = 483;
+  int initialVelocity=4;
+  int velocity=initialVelocity;
+  char direction;
+
+  Player() {
+    img = loadImage("graphics/galaga-player-ship.png");
+    image(img, X, Y);
+  }
+
+  void shoot() {
+    playerBullet = new PlayerBullet(X+6, Y-8);
+  }
+
+  // ********Movement***********
+  // Use a velocity so that movement is maintained when keys are held down
+  void moveLeft(){
+    velocity=initialVelocity;
+    direction='l';
+  }
+  
+  void moveRight(){
+    velocity=initialVelocity;
+    direction='r';
+  }
+
+  void stop(){
+    velocity=0;
+  }
+ 
+  void draw() {
+    if (direction=='l') {
+      X=X-velocity;
+    } 
+    if (player.direction=='r') {
+      X=X+velocity;
+    }
+    image(img, X, Y);
+  }
+};
+
 
 
 class PlayerBullet {
   PImage img;
   int X;
   int Y;
-  int velocity=4;
+  int velocity=5;
 
   PlayerBullet(int x, int y) {
     img = loadImage("graphics/player-bullet.png");
-    player = minim.loadFile("sound/8d82b5_Galaga_Firing_Sound_Effect.mp3");
-    player.play();
+    audioPlayer = minim.loadFile("sound/8d82b5_Galaga_Firing_Sound_Effect.mp3");
+    audioPlayer.play();
       
     X=x;
     Y=y;
@@ -76,8 +120,8 @@ class AlienShip {
     switch(explosionStep) {
     case 1: 
       img = loadImage("graphics/alien-explosion-1.png");
-      player = minim.loadFile("sound/8d82b5_Galaga_Kill_Enemy_Sound_Effect.mp3");
-      player.play();    
+      audioPlayer = minim.loadFile("sound/8d82b5_Galaga_Kill_Enemy_Sound_Effect.mp3");
+      audioPlayer.play();    
       explosionStep++;
       break;
     case 2:
@@ -131,6 +175,7 @@ void setup() {
   size(500, 500);
   frameRate(20);
   initAlienArmy();
+  initPlayer();
 }
 
 
@@ -159,15 +204,14 @@ void initScreen() {
   text("Q to restart", width/2, height/2+50);
   text("A = Move Left | D= Move Right | SPACE=Fire", width/2, height/2+100);
   minim = new Minim(this);
-  player = minim.loadFile("sound/8d82b5_Galaga_Theme_Song.mp3");
-  player.play();
+  audioPlayer = minim.loadFile("sound/8d82b5_Galaga_Theme_Song.mp3");
+  audioPlayer.play();
 }
 void gameScreen() {
   background(0);
-  drawPlayer();
+  player.draw();
   drawPlayerBullet();
   drawAlienArmy();
-  movePlayer();
   movePlayerBullet();
   detectCollision();
 }
@@ -177,25 +221,24 @@ void keyPressed() {
    gameScreen="START";
  
   if (key=='a'||key=='A') {
-    playerDirection='l';
+    player.moveLeft();
   };
   if (key=='d'||key=='D') {
-    playerDirection='r';
+    player.moveRight();
   }   
   if (key==' ') {
-    playerShoot();
+    player.shoot();
   }
   if (key=='q'||key=='Q') {
     setup();
   }
 }
+
+//Slight bug in here when keys are pressed at the same time
 void keyReleased() {
-  if ((key=='a'||key=='A') && playerDirection=='l') {
-    playerDirection=' ';
+  if (key=='a'||key=='A'||key=='d'||key=='D') {
+    player.stop();
   } 
-  if ((key=='d'||key=='D') && playerDirection=='r') {
-    playerDirection=' ';
-  }
 }
 
 /********* COLLISSIONS *********/
@@ -217,6 +260,10 @@ void detectCollision() {
     }
   }
 }
+/********* PLAYER *********/
+void initPlayer() {
+  player = new Player();
+}
 
 /********* ALIENS *********/
 void initAlienArmy() {
@@ -235,25 +282,6 @@ void drawAlienArmy() {
   }
 }
 
-/********* PLAYER *********/
-void drawPlayer() {
-  PImage img; 
-  img = loadImage("graphics/galaga-player-ship.png");
-  image(img, playerX, playerY);
-}
-
-void playerShoot() {
-  playerBullet = new PlayerBullet(playerX+6, playerY-15);
-}
-
-void movePlayer() {
-  if (playerDirection=='l') {
-    playerX=playerX-3;
-  } 
-  if (playerDirection=='r') {
-    playerX=playerX+3;
-  }
-}
 
 void movePlayerBullet() {
   if (playerBullet !=null) {
