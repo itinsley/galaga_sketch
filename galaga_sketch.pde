@@ -61,45 +61,45 @@ class AlienShip {
     return (img.height/2)+Y;
   }
 
-  void drawExplosion(){
+  void drawExplosion() {
     println(explosionStep);
-    if (explosionStep==0){
+    if (explosionStep==0) {
       return;
     }
     switch(explosionStep) {
-      case 1: 
-        img = loadImage("graphics/alien-explosion-1.png");
-        explosionStep++;
-        break;
-      case 2: 
-        img = loadImage("graphics/alien-explosion-2.png");
-        explosionStep++;
-        break;
-      default:
-        println("defualt");
-        img = loadImage("graphics/alien-ship.png"); //Return to default just for now.
-        explosionStep=0;
-        break;
+    case 1: 
+      img = loadImage("graphics/alien-explosion-1.png");
+      explosionStep++;
+      break;
+    case 2: 
+      img = loadImage("graphics/alien-explosion-2.png");
+      explosionStep++;
+      break;
+    default:
+      println("defualt");
+      img = loadImage("graphics/alien-ship.png"); //Return to default just for now.
+      explosionStep=0;
+      break;
     }
   }
-  
+
   void draw() {
     image(img, X, Y);
     drawExplosion();
   }
 
   void checkWall() {
-    if (X>screenSize-img.width){
+    if (X>screenSize-img.width) {
       println("Wall!");
       direction='l';
     }
   }
-  
-  void move(){
+
+  void move() {
     checkWall();
-    if (direction=='r'){
+    if (direction=='r') {
       X=X+1;
-    }else{
+    } else {
       X=X-1;
     }
     Y=Y+gravity;
@@ -133,27 +133,26 @@ void gameScreen() {
 
 /********* INPUTS *********/
 void keyPressed() {
-   if (key=='a'||key=='A'){
-     playerDirection='l';
-   };
-  if (key=='d'||key=='D'){
-     playerDirection='r';
+  if (key=='a'||key=='A') {
+    playerDirection='l';
+  };
+  if (key=='d'||key=='D') {
+    playerDirection='r';
   }   
-  if (key==' '){
-     playerShoot();
+  if (key==' ') {
+    playerShoot();
   }
-  if (key=='q'||key=='Q'){
+  if (key=='q'||key=='Q') {
     setup();
-  }   
-
+  }
 }
 void keyReleased() {
-   if ((key=='a'||key=='A') && playerDirection=='l'){
-     playerDirection=' ';
-   } 
-   if ((key=='d'||key=='D') && playerDirection=='r'){
-     playerDirection=' ';
-   }
+  if ((key=='a'||key=='A') && playerDirection=='l') {
+    playerDirection=' ';
+  } 
+  if ((key=='d'||key=='D') && playerDirection=='r') {
+    playerDirection=' ';
+  }
 }
 
 /********* COLLISSIONS *********/
@@ -172,12 +171,12 @@ void detectCollision() {
 }
 
 /********* ALIENS *********/
-void initAlienArmy(){
+void initAlienArmy() {
   alienShips = new ArrayList<AlienShip>();
   alienShips.add(alienShip = new AlienShip(250, 400));
 }
 
-void drawAlienArmy(){ 
+void drawAlienArmy() { 
   for (AlienShip alienShip : alienShips) {
     alienShip.move();
     alienShip.draw();
@@ -185,33 +184,33 @@ void drawAlienArmy(){
 }
 
 /********* PLAYER *********/
-void drawPlayer(){
+void drawPlayer() {
   PImage img; 
   img = loadImage("graphics/galaga-player-ship.png");
-  image(img,playerX,playerY);
+  image(img, playerX, playerY);
 }
 
-void playerShoot(){
+void playerShoot() {
   playerBullet = new PlayerBullet(playerX+6, playerY-15);
 }
 
-void movePlayer(){
-  if (playerDirection=='l'){
+void movePlayer() {
+  if (playerDirection=='l') {
     playerX=playerX-3;
   } 
-  if (playerDirection=='r'){
+  if (playerDirection=='r') {
     playerX=playerX+3;
-  } 
+  }
 }
 
-void movePlayerBullet(){
-  if (playerBullet !=null){
+void movePlayerBullet() {
+  if (playerBullet !=null) {
     playerBullet.move();
   }
 }
 
-void drawPlayerBullet(){
-  if (playerBullet !=null){
+void drawPlayerBullet() {
+  if (playerBullet !=null) {
     playerBullet.draw();
   }
 }
