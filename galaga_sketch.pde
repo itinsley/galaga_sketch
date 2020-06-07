@@ -13,17 +13,25 @@ class PlayerBullet {
   int Y;
   int velocity=4;
 
-  PlayerBullet(int x, int y){
+  PlayerBullet(int x, int y) {
     img = loadImage("graphics/player-bullet.png");      
     X=x;
     Y=y;
   }
-  
-  void draw(){
-    image(img,X,Y);
+
+  float centreX() {
+    return (img.width/2)+X;
   }
-  
-  void move(){
+
+  float centreY() {
+    return (img.height/2)+Y;
+  }
+
+  void draw() {
+    image(img, X, Y);
+  }
+
+  void move() {
     Y=Y-velocity;
   }
 };
@@ -34,18 +42,53 @@ class AlienShip {
   int Y;
   int gravity=1;
   char direction='r';
+  int explosionStep;
 
-  AlienShip(int x, int y){
+  AlienShip(int x, int y) {
     img = loadImage("graphics/alien-ship.png");      
     X=x;
     Y=y;
   }
-  
-  void draw(){
-    image(img,X,Y);
+
+  void hit() {
+    explosionStep=1;
+  }
+  float centreX() {
+    return (img.width/2)+X;
+  }
+
+  float centreY() {
+    return (img.height/2)+Y;
+  }
+
+  void drawExplosion(){
+    println(explosionStep);
+    if (explosionStep==0){
+      return;
+    }
+    switch(explosionStep) {
+      case 1: 
+        img = loadImage("graphics/alien-explosion-1.png");
+        explosionStep++;
+        break;
+      case 2: 
+        img = loadImage("graphics/alien-explosion-2.png");
+        explosionStep++;
+        break;
+      default:
+        println("defualt");
+        img = loadImage("graphics/alien-ship.png"); //Return to default just for now.
+        explosionStep=0;
+        break;
+    }
   }
   
-  void checkWall(){
+  void draw() {
+    image(img, X, Y);
+    drawExplosion();
+  }
+
+  void checkWall() {
     if (X>screenSize-img.width){
       println("Wall!");
       direction='l';
@@ -67,6 +110,7 @@ class AlienShip {
 
 void setup() {
   size(500, 500);
+  frameRate(10);
   initAlienArmy();
 }
 
@@ -74,7 +118,7 @@ void setup() {
 /********* DRAW BLOCK *********/
 
 void draw() {
-  gameScreen();  
+  gameScreen();
 }
 
 void gameScreen() {
@@ -84,6 +128,7 @@ void gameScreen() {
   drawAlienArmy();
   movePlayer();
   movePlayerBullet();
+  detectCollision();
 }
 
 /********* INPUTS *********/
@@ -96,7 +141,11 @@ void keyPressed() {
   }   
   if (key==' '){
      playerShoot();
+  }
+  if (key=='q'||key=='Q'){
+    setup();
   }   
+
 }
 void keyReleased() {
    if ((key=='a'||key=='A') && playerDirection=='l'){
@@ -104,13 +153,28 @@ void keyReleased() {
    } 
    if ((key=='d'||key=='D') && playerDirection=='r'){
      playerDirection=' ';
-   } 
+   }
+}
+
+/********* COLLISSIONS *********/
+void detectCollision() {
+  int collisionThreshold=5;
+  for (AlienShip alienShip : alienShips) {
+    if (playerBullet !=null) {
+      float distanceX = abs(alienShip.centreX()-playerBullet.centreX());
+      float distanceY = abs(alienShip.centreY()-playerBullet.centreY());
+      if (distanceX< collisionThreshold && distanceY<collisionThreshold) {
+        alienShip.hit();
+      }  
+      //println("diff: "+(alienShip.centreX()-playerBullet.X));
+    }
+  }
 }
 
 /********* ALIENS *********/
 void initAlienArmy(){
   alienShips = new ArrayList<AlienShip>();
-  alienShips.add(alienShip = new AlienShip(250, 10));
+  alienShips.add(alienShip = new AlienShip(250, 400));
 }
 
 void drawAlienArmy(){ 
