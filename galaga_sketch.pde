@@ -268,11 +268,18 @@ void initPlayer() {
 /********* ALIENS *********/
 void initAlienArmy() {
   alienShips = new ArrayList<AlienShip>();
-  int posX = 20;
-  for (int i = 1; i <= 10 ; i++) {
-    alienShips.add(alienShip = new AlienShip(posX, 200));
-    posX = posX + 20;
+  int posXMargin=20;
+  int posYMargin = 20;
+  int posY = posYMargin;
+  for (int row = 1; row <= 3 ; row++) {
+    int posX = posXMargin;
+    for (int col = 1; col <= 10 ; col++) {
+      alienShips.add(alienShip = new AlienShip(posX, posY));
+      posX = posX + posXMargin;
+    }
+    posY=posY+posYMargin;
   }
+
 }
 
 void drawAlienArmy() { 
