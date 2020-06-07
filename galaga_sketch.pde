@@ -186,7 +186,12 @@ void detectCollision() {
 /********* ALIENS *********/
 void initAlienArmy() {
   alienShips = new ArrayList<AlienShip>();
-  alienShips.add(alienShip = new AlienShip(250, 400));
+  int posX = 20;
+  for (int i = 1; i <= 10 ; i++) {
+    println (posX);
+    alienShips.add(alienShip = new AlienShip(posX, 400));
+    posX = posX + 20;
+  }
 }
 
 void drawAlienArmy() { 
