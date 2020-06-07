@@ -1,3 +1,5 @@
+import ddf.minim.*;
+
 /********* VARIABLES *********/
 int screenSize = 500;
 int playerX = 242;
@@ -6,6 +8,9 @@ char playerDirection;
 PlayerBullet playerBullet;
 AlienShip alienShip;
 ArrayList<AlienShip> alienShips;
+Minim minim;
+AudioPlayer player;
+
 
 class PlayerBullet {
   PImage img;
@@ -14,7 +19,10 @@ class PlayerBullet {
   int velocity=4;
 
   PlayerBullet(int x, int y) {
-    img = loadImage("graphics/player-bullet.png");      
+    img = loadImage("graphics/player-bullet.png");
+    player = minim.loadFile("sound/8d82b5_Galaga_Firing_Sound_Effect.mp3");
+    player.play();
+      
     X=x;
     Y=y;
   }
@@ -62,13 +70,14 @@ class AlienShip {
   }
 
   void drawExplosion() {
-    println(explosionStep);
     if (explosionStep==0) {
       return;
     }
     switch(explosionStep) {
     case 1: 
       img = loadImage("graphics/alien-explosion-1.png");
+      player = minim.loadFile("sound/8d82b5_Galaga_Kill_Enemy_Sound_Effect.mp3");
+      player.play();    
       explosionStep++;
       break;
     case 2:
@@ -76,6 +85,10 @@ class AlienShip {
       explosionStep++;
       break;
     case 3:
+      img = loadImage("graphics/alien-explosion-3.png");
+      explosionStep++;
+      break;
+    case 4:
       //Wait a cycle
       explosionStep++;
       break;
@@ -87,7 +100,6 @@ class AlienShip {
   }
 
   boolean isAlive() {
-    println (explosionStep);
     return(explosionStep<4);
   }
 
@@ -98,7 +110,6 @@ class AlienShip {
 
   void checkWall() {
     if (X>screenSize-img.width) {
-      println("Wall!");
       direction='l';
     }
   }
@@ -118,7 +129,7 @@ class AlienShip {
 
 void setup() {
   size(500, 500);
-  frameRate(10);
+  frameRate(20);
   initAlienArmy();
 }
 
@@ -128,24 +139,28 @@ void setup() {
 // We control which screen is active by settings / updating
 // gameScreen variable. We display the correct screen according
 // to the value of this variable.
-//
-// 0: Initial Screen
-// 1: Game Screen
-// 2: Game-over Screen
-int gameScreen = 0;
+String gameScreen = "INSTRUCTIONS";
 
 void draw() {
   switch(gameScreen) {
-    case 1: 
-      gameScreen();
-    case 0:
+    case "INSTRUCTIONS": 
       initScreen();
+      gameScreen="";
+      break;
+    case "START":
+      gameScreen();
+      break;
   }
 }
 void initScreen() {
   background(0);
   textAlign(CENTER);
-  text("Any key to start", height/2, width/2);
+  text("Any key to start", width/2, height/2);
+  text("Q to restart", width/2, height/2+50);
+  text("A = Move Left | D= Move Right | SPACE=Fire", width/2, height/2+100);
+  minim = new Minim(this);
+  player = minim.loadFile("sound/8d82b5_Galaga_Theme_Song.mp3");
+  player.play();
 }
 void gameScreen() {
   background(0);
@@ -159,6 +174,8 @@ void gameScreen() {
 
 /********* INPUTS *********/
 void keyPressed() {
+   gameScreen="START";
+ 
   if (key=='a'||key=='A') {
     playerDirection='l';
   };
@@ -206,8 +223,7 @@ void initAlienArmy() {
   alienShips = new ArrayList<AlienShip>();
   int posX = 20;
   for (int i = 1; i <= 10 ; i++) {
-    println (posX);
-    alienShips.add(alienShip = new AlienShip(posX, 400));
+    alienShips.add(alienShip = new AlienShip(posX, 200));
     posX = posX + 20;
   }
 }
