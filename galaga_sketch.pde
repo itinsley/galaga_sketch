@@ -3,17 +3,28 @@ int screenSize = 500;
 int playerX = 242;
 int playerY = 483;
 char playerDirection;
+PlayerBullet playerBullet;
 
+class PlayerBullet {
+  PImage img;  // Declare a variable of type PImage
+  int X;
+  int Y;
+  int velocity=4;
 
-// We control which screen is active by settings / updating
-// gameScreen variable. We display the correct screen according
-// to the value of this variable.
-//
-// 0: Initial Screen
-// 1: Game Screen
-// 2: Game-over Screen
-
-int gameScreen = 0;
+  PlayerBullet(int x, int y){
+    img = loadImage("graphics/player-bullet.png");      
+    X=x;
+    Y=y;
+  }
+  
+  void draw(){
+    image(img,X,Y);
+  }
+  
+  void move(){
+    Y=Y-velocity;
+  }
+};
 
 /********* SETUP BLOCK *********/
 
@@ -31,7 +42,9 @@ void draw() {
 void gameScreen() {
   background(0);
   drawPlayer();
+  drawPlayerBullet();
   movePlayer();
+  movePlayerBullet();
 }
 
 /********* INPUTS *********/
@@ -41,6 +54,9 @@ void keyPressed() {
    };
   if (key=='d'||key=='D'){
      playerDirection='r';
+  }   
+  if (key==' '){
+     playerShoot();
   }   
 }
 void keyReleased() {
@@ -59,6 +75,10 @@ void drawPlayer(){
   image(img,playerX,playerY);
 }
 
+void playerShoot(){
+  playerBullet = new PlayerBullet(playerX+6, playerY-15);
+}
+
 void movePlayer(){
   if (playerDirection=='l'){
     playerX=playerX-3;
@@ -66,4 +86,16 @@ void movePlayer(){
   if (playerDirection=='r'){
     playerX=playerX+3;
   } 
+}
+
+void movePlayerBullet(){
+  if (playerBullet !=null){
+    playerBullet.move();
+  }
+}
+
+void drawPlayerBullet(){
+  if (playerBullet !=null){
+    playerBullet.draw();
+  }
 }
