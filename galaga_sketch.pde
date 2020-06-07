@@ -2,6 +2,7 @@ import ddf.minim.*;
 
 /********* VARIABLES *********/
 int screenSize = 500;
+int score=0;
 Player player;
 PlayerBullet playerBullet;
 AlienShip alienShip;
@@ -104,6 +105,7 @@ class AlienShip {
 
   void hit() {
     explosionStep=1;
+    score=score+1; //Shouldn't be updating globals here
   }
   float centreX() {
     return (img.width/2)+X;
@@ -176,6 +178,7 @@ void setup() {
   frameRate(20);
   initAlienArmy();
   initPlayer();
+  score=0;
 }
 
 
@@ -209,6 +212,9 @@ void initScreen() {
 }
 void gameScreen() {
   background(0);
+  textAlign(LEFT);
+  text("SCORE: "+score, 10, 10);
+
   player.draw();
   drawPlayerBullet();
   drawAlienArmy();
