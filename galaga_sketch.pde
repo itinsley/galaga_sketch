@@ -4,9 +4,11 @@ int playerX = 242;
 int playerY = 483;
 char playerDirection;
 PlayerBullet playerBullet;
+AlienShip alienShip;
+ArrayList<AlienShip> alienShips;
 
 class PlayerBullet {
-  PImage img;  // Declare a variable of type PImage
+  PImage img;
   int X;
   int Y;
   int velocity=4;
@@ -26,10 +28,46 @@ class PlayerBullet {
   }
 };
 
+class AlienShip {
+  PImage img;  
+  int X;
+  int Y;
+  int gravity=1;
+  char direction='r';
+
+  AlienShip(int x, int y){
+    img = loadImage("graphics/alien-ship.png");      
+    X=x;
+    Y=y;
+  }
+  
+  void draw(){
+    image(img,X,Y);
+  }
+  
+  void checkWall(){
+    if (X>screenSize-img.width){
+      println("Wall!");
+      direction='l';
+    }
+  }
+  
+  void move(){
+    checkWall();
+    if (direction=='r'){
+      X=X+1;
+    }else{
+      X=X-1;
+    }
+    Y=Y+gravity;
+  }
+};
+
 /********* SETUP BLOCK *********/
 
 void setup() {
   size(500, 500);
+  initAlienArmy();
 }
 
 
@@ -43,6 +81,7 @@ void gameScreen() {
   background(0);
   drawPlayer();
   drawPlayerBullet();
+  drawAlienArmy();
   movePlayer();
   movePlayerBullet();
 }
@@ -68,9 +107,22 @@ void keyReleased() {
    } 
 }
 
+/********* ALIENS *********/
+void initAlienArmy(){
+  alienShips = new ArrayList<AlienShip>();
+  alienShips.add(alienShip = new AlienShip(250, 10));
+}
+
+void drawAlienArmy(){ 
+  for (AlienShip alienShip : alienShips) {
+    alienShip.move();
+    alienShip.draw();
+  }
+}
+
 /********* PLAYER *********/
 void drawPlayer(){
-  PImage img;  // Declare a variable of type PImage
+  PImage img; 
   img = loadImage("graphics/galaga-player-ship.png");
   image(img,playerX,playerY);
 }
