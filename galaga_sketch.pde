@@ -125,10 +125,28 @@ void setup() {
 
 /********* DRAW BLOCK *********/
 
-void draw() {
-  gameScreen();
-}
+// We control which screen is active by settings / updating
+// gameScreen variable. We display the correct screen according
+// to the value of this variable.
+//
+// 0: Initial Screen
+// 1: Game Screen
+// 2: Game-over Screen
+int gameScreen = 0;
 
+void draw() {
+  switch(gameScreen) {
+    case 1: 
+      gameScreen();
+    case 0:
+      initScreen();
+  }
+}
+void initScreen() {
+  background(0);
+  textAlign(CENTER);
+  text("Any key to start", height/2, width/2);
+}
 void gameScreen() {
   background(0);
   drawPlayer();
