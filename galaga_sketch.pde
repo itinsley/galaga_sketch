@@ -28,7 +28,7 @@ class Player {
   Player() {
     image(playerImage, X, Y);
   }
-  
+
   float centreX() {
     return (playerImage.width/2)+X;
   }
@@ -36,20 +36,20 @@ class Player {
   float centreY() {
     return (playerImage.height/2)+Y;
   }
-  
+
   void shoot() {
-    if (playerBullets.size()<=5){
+    if (playerBullets.size()<=5) {
       playerBullets.add(new PlayerBullet(X+6, Y-8));
     }
   }
 
-  void move(char direction){
+  void move(char direction) {
     if (direction=='l') {
       X=X-velocity;
     } 
     if (direction=='r') {
       X=X+velocity;
-    }    
+    }
   }
   void draw() {
     image(playerImage, X, Y);
@@ -77,8 +77,8 @@ class PlayerBullet {
   float centreY() {
     return (bulletImage.height/2)+Y;
   }
-  
-  boolean outOfScreen(){
+
+  boolean outOfScreen() {
     return Y<=0;
   }
   void draw() {
@@ -96,7 +96,7 @@ class AlienShip {
   int descent=1;
   int descentCounter;
   int descentRate=2;
-  
+
   char direction='r';
   int explosionStep=0;
   PImage alienShipImage;
@@ -171,15 +171,15 @@ class AlienShip {
     } else {
       X=X-1;
     }
-    
-    if (descentCounter>=descentRate){
+
+    if (descentCounter>=descentRate) {
       Y=Y+descent;
       descentCounter=0;
     }
-    descentCounter++;    
+    descentCounter++;
   }
-  
-  void changeDirection(char direction){
+
+  void changeDirection(char direction) {
     this.direction = direction;
   }
 };
@@ -193,11 +193,11 @@ void setup() {
   alienExplosion1Image = loadImage("graphics/alien-explosion-1.png");
   alienExplosion2Image = loadImage("graphics/alien-explosion-2.png");
   alienExplosion3Image = loadImage("graphics/alien-explosion-3.png");
-    
+
   minim = new Minim(this);  
   bulletSound = minim.loadFile("sound/8d82b5_Galaga_Firing_Sound_Effect.mp3");    
   killSound = minim.loadFile("sound/8d82b5_Galaga_Kill_Enemy_Sound_Effect.mp3");
- 
+
   size(500, 500);
   frameRate(40);
   initAlienArmy();
@@ -216,16 +216,16 @@ String gameScreen = "INSTRUCTIONS";
 
 void draw() {
   switch(gameScreen) {
-    case "INSTRUCTIONS": 
-      initScreen();
-      gameScreen="";
-      break;
-    case "START":
-      gameScreen();
-      break;
-    case "GAMEOVER":
-      gameOverScreen();
-      break;
+  case "INSTRUCTIONS": 
+    initScreen();
+    gameScreen="";
+    break;
+  case "START":
+    gameScreen();
+    break;
+  case "GAMEOVER":
+    gameOverScreen();
+    break;
   }
 }
 void initScreen() {
@@ -262,11 +262,11 @@ void gameOverScreen() {
 
 /********* INPUTS *********/
 void keyPressed() {
-  if (gameScreen=="GAMEOVER" && key!='q' && key!='Q'){
-    return; 
+  if (gameScreen=="GAMEOVER" && key!='q' && key!='Q') {
+    return;
   }
   gameScreen="START";
-   
+
   if (key=='a'||key=='A') {
     playerDirection='l';
   };
@@ -279,28 +279,26 @@ void keyPressed() {
   if (key=='q'||key=='Q') {
     setup();
   }
-  
+
   if (key=='x'||key=='X') {
-     //debug
+    //debug
   }
-  
-  
 }
 
 void keyReleased() {
-  if ((key=='a'||key=='A')&& playerDirection=='l'){
+  if ((key=='a'||key=='A')&& playerDirection=='l') {
     playerDirection=' ';
   } 
-  if ((key=='d'||key=='D')&& playerDirection=='r'){
+  if ((key=='d'||key=='D')&& playerDirection=='r') {
     playerDirection=' ';
-  } 
+  }
 }
 
 /********* COLLISIONS *********/
 void detectCollision() {
   int collisionThreshold=5;
   int playerCollisionThreshold=15;
-  
+
   //** Bullets **
   //Iterate backwards as we may be removing
   for (int pbIdx = playerBullets.size() - 1; pbIdx >= 0; pbIdx--) {
@@ -313,19 +311,19 @@ void detectCollision() {
       float distanceY = abs(alienShip.centreY()-playerBullet.centreY());
       if (distanceX< collisionThreshold && distanceY<collisionThreshold) {
         alienShip.hit();
-        break;          
+        break;
       }
       if (!alienShip.isAlive()) {
         alienShips.remove(i);
         playerBullets.remove(playerBullets.get(pbIdx));
       }
     }
-    if (playerBullet !=null && playerBullet.outOfScreen()){
+    if (playerBullet !=null && playerBullet.outOfScreen()) {
       playerBullet=null;
       playerBullets.remove(playerBullets.get(pbIdx));
     }
   }
-  
+
   //** Alien Ships
   for (int i = alienShips.size() - 1; i >= 0; i--) {
     AlienShip alienShip = alienShips.get(i);
@@ -337,16 +335,13 @@ void detectCollision() {
       break;
     }
   }
-
-  
-  
 }
 /********* PLAYER *********/
 void initPlayer() {
   player = new Player();
 }
 
-void initPlayerBullets(){
+void initPlayerBullets() {
   playerBullets = new ArrayList<PlayerBullet>();
 }
 
@@ -356,9 +351,9 @@ void initAlienArmy() {
   int posXMargin=20;
   int posYMargin = 20;
   int posY = posYMargin;
-  for (int row = 1; row <= 3 ; row++) {
+  for (int row = 1; row <= 3; row++) {
     int posX = posXMargin;
-    for (int col = 1; col <= 10 ; col++) {
+    for (int col = 1; col <= 10; col++) {
       alienShips.add(alienShip = new AlienShip(posX, posY));
       posX = posX + posXMargin;
     }
@@ -373,7 +368,7 @@ void drawAlienArmy() {
   }
 }
 
-void alienArmyChangeDirection(char direction){
+void alienArmyChangeDirection(char direction) {
   for (AlienShip alienShip : alienShips) {
     alienShip.changeDirection(direction);
   }
