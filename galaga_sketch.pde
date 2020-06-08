@@ -28,7 +28,15 @@ class Player {
   Player() {
     image(playerImage, X, Y);
   }
+  
+  float centreX() {
+    return (playerImage.width/2)+X;
+  }
 
+  float centreY() {
+    return (playerImage.height/2)+Y;
+  }
+  
   void shoot() {
     if (playerBullets.size()<=5){
       playerBullets.add(new PlayerBullet(X+6, Y-8));
@@ -87,7 +95,7 @@ class AlienShip {
   int Y;
   int descent=1;
   int descentCounter;
-  int descentRate=3;
+  int descentRate=2;
   
   char direction='r';
   int explosionStep=0;
@@ -112,9 +120,6 @@ class AlienShip {
   }
 
   void drawExplosion() {
-    if (explosionStep==0) {
-      return;
-    }
     switch(explosionStep) {
     case 1: 
       alienShipImage = alienExplosion1Image;
@@ -189,7 +194,6 @@ void setup() {
   alienExplosion2Image = loadImage("graphics/alien-explosion-2.png");
   alienExplosion3Image = loadImage("graphics/alien-explosion-3.png");
     
-  
   minim = new Minim(this);  
   bulletSound = minim.loadFile("sound/8d82b5_Galaga_Firing_Sound_Effect.mp3");    
   killSound = minim.loadFile("sound/8d82b5_Galaga_Kill_Enemy_Sound_Effect.mp3");
@@ -219,6 +223,9 @@ void draw() {
     case "START":
       gameScreen();
       break;
+    case "GAMEOVER":
+      gameOverScreen();
+      break;
   }
 }
 void initScreen() {
@@ -240,15 +247,26 @@ void gameScreen() {
   drawAlienArmy();
   movePlayerBullet();
   detectCollision();
-  long maxMemory = Runtime.getRuntime().maxMemory();
-  long allocatedMemory = Runtime.getRuntime().totalMemory();
-  long freeMemory = Runtime.getRuntime().freeMemory();
-  println("Allocated Memory: "+ allocatedMemory);
+  //long maxMemory = Runtime.getRuntime().maxMemory();
+  //long allocatedMemory = Runtime.getRuntime().totalMemory();
+  //long freeMemory = Runtime.getRuntime().freeMemory();
+  //println("Allocated Memory: "+ allocatedMemory);
+}
+void gameOverScreen() {
+  background(0);
+  textAlign(CENTER);
+  text("GAME OVER", width/2, height/2);
+  text("SCORE: "+score, width/2, height/2+40);
+  text("Press Q to restart", width/2, height/2+80);
 }
 
 /********* INPUTS *********/
 void keyPressed() {
-   gameScreen="START";
+  if (gameScreen=="GAMEOVER" && key!='q' && key!='Q'){
+    return; 
+  }
+  gameScreen="START";
+   
   if (key=='a'||key=='A') {
     playerDirection='l';
   };
@@ -279,9 +297,12 @@ void keyReleased() {
   } 
 }
 
-/********* COLLISSIONS *********/
+/********* COLLISIONS *********/
 void detectCollision() {
   int collisionThreshold=5;
+  int playerCollisionThreshold=15;
+  
+  //** Bullets **
   //Iterate backwards as we may be removing
   for (int pbIdx = playerBullets.size() - 1; pbIdx >= 0; pbIdx--) {
     PlayerBullet playerBullet = playerBullets.get(pbIdx);
@@ -293,7 +314,6 @@ void detectCollision() {
       float distanceY = abs(alienShip.centreY()-playerBullet.centreY());
       if (distanceX< collisionThreshold && distanceY<collisionThreshold) {
         alienShip.hit();
-        playerBullets.remove(pbIdx);
         break;          
       }
       if (!alienShip.isAlive()) {
@@ -305,6 +325,21 @@ void detectCollision() {
       playerBullets.remove(playerBullets.get(pbIdx));
     }
   }
+  
+  //** Alien Ships
+  for (int i = alienShips.size() - 1; i >= 0; i--) {
+    AlienShip alienShip = alienShips.get(i);
+    // ** Hit Player?
+    float distanceX = abs(alienShip.centreX()-player.centreX());
+    float distanceY = abs(alienShip.centreY()-player.centreY());
+    if (distanceX< playerCollisionThreshold && distanceY<playerCollisionThreshold) {
+      gameScreen="GAMEOVER";
+      break;
+    }
+  }
+
+  
+  
 }
 /********* PLAYER *********/
 void initPlayer() {
