@@ -4,6 +4,7 @@ import ddf.minim.*;
 int screenSize = 500;
 int score=0;
 Player player;
+char playerDirection;
 ArrayList<PlayerBullet> playerBullets;
 AlienShip alienShip;
 ArrayList<AlienShip> alienShips;
@@ -15,9 +16,7 @@ class Player {
   PImage img;
   int X = 242;
   int Y = 483;
-  int initialVelocity=4;
-  int velocity=initialVelocity;
-  char direction;
+  int velocity=4;
 
   Player() {
     img = loadImage("graphics/galaga-player-ship.png");
@@ -30,29 +29,15 @@ class Player {
     }
   }
 
-  // ********Movement***********
-  // Use a velocity so that movement is maintained when keys are held down
-  void moveLeft(){
-    velocity=initialVelocity;
-    direction='l';
-  }
-  
-  void moveRight(){
-    velocity=initialVelocity;
-    direction='r';
-  }
-
-  void stop(){
-    velocity=0;
-  }
- 
-  void draw() {
+  void move(char direction){
     if (direction=='l') {
       X=X-velocity;
     } 
-    if (player.direction=='r') {
+    if (direction=='r') {
       X=X+velocity;
-    }
+    }    
+  }
+  void draw() {
     image(img, X, Y);
   }
 };
@@ -220,6 +205,7 @@ void gameScreen() {
   background(0);
   textAlign(LEFT);
   text("SCORE: "+score, 10, 10);
+  player.move(playerDirection);
   player.draw();
   drawPlayerBullets();
   drawAlienArmy();
@@ -231,10 +217,10 @@ void gameScreen() {
 void keyPressed() {
    gameScreen="START";
   if (key=='a'||key=='A') {
-    player.moveLeft();
+    playerDirection='l';
   };
   if (key=='d'||key=='D') {
-    player.moveRight();
+    playerDirection='r';
   }   
   if (key==' ') {
     player.shoot();
@@ -246,8 +232,11 @@ void keyPressed() {
 
 //Slight bug in here when keys are pressed at the same time
 void keyReleased() {
-  if (key=='a'||key=='A'||key=='d'||key=='D') {
-    player.stop();
+  if ((key=='a'||key=='A')&& playerDirection=='l'){
+    playerDirection=' ';
+  } 
+  if ((key=='d'||key=='D')&& playerDirection=='r'){
+    playerDirection=' ';
   } 
 }
 
