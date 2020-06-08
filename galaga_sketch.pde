@@ -10,17 +10,23 @@ AlienShip alienShip;
 ArrayList<AlienShip> alienShips;
 Minim minim;
 AudioPlayer audioPlayer;
+PImage playerImage;
+PImage bulletImage;
+PImage alienShipImageDefault;
+PImage alienExplosion1Image;
+PImage alienExplosion2Image;
+PImage alienExplosion3Image;
 
+AudioPlayer bulletSound;
+AudioPlayer killSound;
 
 class Player {
-  PImage img;
   int X = 242;
   int Y = 483;
   int velocity=4;
 
   Player() {
-    img = loadImage("graphics/galaga-player-ship.png");
-    image(img, X, Y);
+    image(playerImage, X, Y);
   }
 
   void shoot() {
@@ -38,40 +44,37 @@ class Player {
     }    
   }
   void draw() {
-    image(img, X, Y);
+    image(playerImage, X, Y);
   }
 };
 
 
 
 class PlayerBullet {
-  PImage img;
   int X;
   int Y;
   int velocity=5;
 
   PlayerBullet(int x, int y) {
-    img = loadImage("graphics/player-bullet.png");
-    audioPlayer = minim.loadFile("sound/8d82b5_Galaga_Firing_Sound_Effect.mp3");
-    audioPlayer.play();
-      
+    bulletSound.play();
+    bulletSound.rewind();
     X=x;
     Y=y;
   }
 
   float centreX() {
-    return (img.width/2)+X;
+    return (bulletImage.width/2)+X;
   }
 
   float centreY() {
-    return (img.height/2)+Y;
+    return (bulletImage.height/2)+Y;
   }
   
   boolean outOfScreen(){
     return Y<=0;
   }
   void draw() {
-    image(img, X, Y);
+    image(bulletImage, X, Y);
   }
 
   void move() {
@@ -80,15 +83,15 @@ class PlayerBullet {
 };
 
 class AlienShip {
-  PImage img;  
   int X;
   int Y;
   int gravity=1;
   char direction='r';
   int explosionStep=0;
+  PImage alienShipImage;
 
   AlienShip(int x, int y) {
-    img = loadImage("graphics/alien-ship.png");      
+    alienShipImage = alienShipImageDefault;
     X=x;
     Y=y;
   }
@@ -98,11 +101,11 @@ class AlienShip {
     score=score+1; //Shouldn't be updating globals here
   }
   float centreX() {
-    return (img.width/2)+X;
+    return (alienShipImage.width/2)+X;
   }
 
   float centreY() {
-    return (img.height/2)+Y;
+    return (alienShipImage.height/2)+Y;
   }
 
   void drawExplosion() {
@@ -111,17 +114,16 @@ class AlienShip {
     }
     switch(explosionStep) {
     case 1: 
-      img = loadImage("graphics/alien-explosion-1.png");
-      audioPlayer = minim.loadFile("sound/8d82b5_Galaga_Kill_Enemy_Sound_Effect.mp3");
-      audioPlayer.play();    
+      alienShipImage = alienExplosion1Image;
+      killSound.play();    
       explosionStep++;
       break;
     case 2:
-      img = loadImage("graphics/alien-explosion-2.png");
+      alienShipImage = alienExplosion2Image;
       explosionStep++;
       break;
     case 3:
-      img = loadImage("graphics/alien-explosion-3.png");
+      alienShipImage = alienExplosion3Image;
       explosionStep++;
       break;
     case 4:
@@ -129,7 +131,7 @@ class AlienShip {
       explosionStep++;
       break;
     default:
-      img = loadImage("graphics/alien-ship.png"); //Return to default just for now.
+      alienShipImage = alienShipImageDefault; //Return to default just for now.
       explosionStep=0;
       break;
     }
@@ -140,12 +142,12 @@ class AlienShip {
   }
 
   void draw() {
-    image(img, X, Y);
+    image(alienShipImage, X, Y);
     drawExplosion();
   }
 
   void checkWall() {
-    if (X>screenSize-img.width) {
+    if (X>screenSize-alienShipImage.width) {
       direction='l';
     }
   }
@@ -164,6 +166,18 @@ class AlienShip {
 /********* SETUP BLOCK *********/
 
 void setup() {
+  bulletImage = loadImage("graphics/player-bullet.png");
+  playerImage = loadImage("graphics/galaga-player-ship.png");
+  alienShipImageDefault = loadImage("graphics/alien-ship.png");
+  alienExplosion1Image = loadImage("graphics/alien-explosion-1.png");
+  alienExplosion2Image = loadImage("graphics/alien-explosion-2.png");
+  alienExplosion3Image = loadImage("graphics/alien-explosion-3.png");
+    
+  
+  minim = new Minim(this);  
+  bulletSound = minim.loadFile("sound/8d82b5_Galaga_Firing_Sound_Effect.mp3");    
+  killSound = minim.loadFile("sound/8d82b5_Galaga_Kill_Enemy_Sound_Effect.mp3");
+ 
   size(500, 500);
   frameRate(40);
   initAlienArmy();
@@ -197,7 +211,6 @@ void initScreen() {
   text("Any key to start", width/2, height/2);
   text("Q to restart", width/2, height/2+50);
   text("A = Move Left | D= Move Right | SPACE=Fire", width/2, height/2+100);
-  minim = new Minim(this);
   audioPlayer = minim.loadFile("sound/8d82b5_Galaga_Theme_Song.mp3");
   audioPlayer.play();
 }
@@ -211,6 +224,10 @@ void gameScreen() {
   drawAlienArmy();
   movePlayerBullet();
   detectCollision();
+  long maxMemory = Runtime.getRuntime().maxMemory();
+  long allocatedMemory = Runtime.getRuntime().totalMemory();
+  long freeMemory = Runtime.getRuntime().freeMemory();
+  println("Allocated Memory: "+ allocatedMemory);
 }
 
 /********* INPUTS *********/
@@ -228,6 +245,12 @@ void keyPressed() {
   if (key=='q'||key=='Q') {
     setup();
   }
+  
+  if (key=='x'||key=='X') {
+     //debug
+  }
+  
+  
 }
 
 //Slight bug in here when keys are pressed at the same time
@@ -255,13 +278,15 @@ void detectCollision() {
       if (distanceX< collisionThreshold && distanceY<collisionThreshold) {
         alienShip.hit();
         playerBullets.remove(pbIdx);
+        break;          
       }
       if (!alienShip.isAlive()) {
         alienShips.remove(i);
       }
     }
     if (playerBullet !=null && playerBullet.outOfScreen()){
-      playerBullets.remove(playerBullet);
+      playerBullet=null;
+      playerBullets.remove(playerBullets.get(pbIdx));
     }
   }
 }
