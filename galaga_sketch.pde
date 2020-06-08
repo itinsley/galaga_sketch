@@ -318,6 +318,7 @@ void detectCollision() {
       }
       if (!alienShip.isAlive()) {
         alienShips.remove(i);
+        playerBullets.remove(playerBullets.get(pbIdx));
       }
     }
     if (playerBullet !=null && playerBullet.outOfScreen()){
