@@ -85,7 +85,10 @@ class PlayerBullet {
 class AlienShip {
   int X;
   int Y;
-  int gravity=1;
+  int descent=1;
+  int descentCounter;
+  int descentRate=3;
+  
   char direction='r';
   int explosionStep=0;
   PImage alienShipImage;
@@ -163,7 +166,12 @@ class AlienShip {
     } else {
       X=X-1;
     }
-    Y=Y+gravity;
+    
+    if (descentCounter>=descentRate){
+      Y=Y+descent;
+      descentCounter=0;
+    }
+    descentCounter++;    
   }
   
   void changeDirection(char direction){
