@@ -13,6 +13,7 @@ AudioPlayer audioPlayer;
 PImage playerImage;
 PImage bulletImage;
 PImage alienShipImageDefault;
+PImage alienShipImageArmsIn;
 PImage alienShipAttackerImageDefault;
 PImage alienExplosion1Image;
 PImage alienExplosion2Image;
@@ -107,6 +108,8 @@ class AlienShip {
 
   char direction='r';
   int explosionStep=0;
+  int renderCounter=0;
+  
   PImage currentImage;
   PImage defaultImage = alienShipImageDefault;
   
@@ -133,30 +136,40 @@ class AlienShip {
   }
 
   void draw() {
+    
     image(currentImage, X, Y);
     switch(explosionStep) {
-    case 1: 
-      currentImage = alienExplosion1Image;
-      killSound.play();    
-      explosionStep++;
-      break;
-    case 2:
-      currentImage = alienExplosion2Image;
-      explosionStep++;
-      break;
-    case 3:
-      currentImage = alienExplosion3Image;
-      explosionStep++;
-      break;
-    case 4:
-      //Wait a cycle
-      explosionStep++;
-      break;
-    default:
-      currentImage = defaultImage; //Return to default just for now.
-      explosionStep=0;
-      break;
+      case 1: 
+        currentImage = alienExplosion1Image;
+        killSound.play();    
+        explosionStep++;
+        break;
+      case 2:
+        currentImage = alienExplosion2Image;
+        explosionStep++;
+        break;
+      case 3:
+        currentImage = alienExplosion3Image;
+        explosionStep++;
+        break;
+      case 4:
+        //Wait a cycle
+        explosionStep++;
+        break;
+      default:
+        explosionStep=0;
+        // Animate
+        if (renderCounter>=20){
+          if (currentImage == alienShipImageArmsIn){
+            currentImage = alienShipImageDefault;
+          } else {
+            currentImage = alienShipImageArmsIn;
+          };
+          renderCounter=0;
+        }
     }
+
+    renderCounter++;
   }
 
   void checkWall() {
@@ -194,6 +207,7 @@ void setup() {
   bulletImage = loadImage("graphics/player-bullet.png");
   playerImage = loadImage("graphics/galaga-player-ship.png");
   alienShipImageDefault = loadImage("graphics/alien-ship.png");
+  alienShipImageArmsIn = loadImage("graphics/alien-ship-arms-in.png");
   alienShipAttackerImageDefault = loadImage("graphics/alien-ship-attacker.png");
   alienExplosion1Image = loadImage("graphics/alien-explosion-1.png");
   alienExplosion2Image = loadImage("graphics/alien-explosion-2.png");
