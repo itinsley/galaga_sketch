@@ -4,7 +4,7 @@ import ddf.minim.*;
 int screenSize = 500;
 int score=0;
 Player player;
-PlayerBullet playerBullet;
+ArrayList<PlayerBullet> playerBullets;
 AlienShip alienShip;
 ArrayList<AlienShip> alienShips;
 Minim minim;
@@ -25,7 +25,7 @@ class Player {
   }
 
   void shoot() {
-    playerBullet = new PlayerBullet(X+6, Y-8);
+    playerBullets.add(new PlayerBullet(X+6, Y-8));
   }
 
   // ********Movement***********
@@ -175,9 +175,11 @@ class AlienShip {
 
 void setup() {
   size(500, 500);
-  frameRate(20);
+  frameRate(40);
   initAlienArmy();
   initPlayer();
+  initPlayerBullets();
+ 
   score=0;
 }
 
@@ -216,7 +218,7 @@ void gameScreen() {
   text("SCORE: "+score, 10, 10);
 
   player.draw();
-  drawPlayerBullet();
+  drawPlayerBullets();
   drawAlienArmy();
   movePlayerBullet();
   detectCollision();
@@ -250,25 +252,31 @@ void keyReleased() {
 /********* COLLISSIONS *********/
 void detectCollision() {
   int collisionThreshold=5;
-  if (playerBullet ==null) {
-    return;
-  }
+  //Iterate backwards as we may be removing
+  for (int pbIdx = playerBullets.size() - 1; pbIdx >= 0; pbIdx--) {
+    PlayerBullet playerBullet = playerBullets.get(pbIdx);
 
-  for (int i = alienShips.size() - 1; i >= 0; i--) {
-    AlienShip alienShip = alienShips.get(i);
-    float distanceX = abs(alienShip.centreX()-playerBullet.centreX());
-    float distanceY = abs(alienShip.centreY()-playerBullet.centreY());
-    if (distanceX< collisionThreshold && distanceY<collisionThreshold) {
-      alienShip.hit();
-    }
-    if (!alienShip.isAlive()) {
-      alienShips.remove(i);
+    //Iterate backwards as we may be removing
+    for (int i = alienShips.size() - 1; i >= 0; i--) {
+      AlienShip alienShip = alienShips.get(i);
+      float distanceX = abs(alienShip.centreX()-playerBullet.centreX());
+      float distanceY = abs(alienShip.centreY()-playerBullet.centreY());
+      if (distanceX< collisionThreshold && distanceY<collisionThreshold) {
+        alienShip.hit();
+      }
+      if (!alienShip.isAlive()) {
+        alienShips.remove(i);
+      }
     }
   }
 }
 /********* PLAYER *********/
 void initPlayer() {
   player = new Player();
+}
+
+void initPlayerBullets(){
+  playerBullets = new ArrayList<PlayerBullet>();
 }
 
 /********* ALIENS *********/
@@ -297,13 +305,14 @@ void drawAlienArmy() {
 
 
 void movePlayerBullet() {
-  if (playerBullet !=null) {
+  for (PlayerBullet playerBullet : playerBullets) {
     playerBullet.move();
   }
 }
 
-void drawPlayerBullet() {
-  if (playerBullet !=null) {
+void drawPlayerBullets() {
+  println("PlayerBullets size", playerBullets.size());
+  for (PlayerBullet playerBullet : playerBullets) {
     playerBullet.draw();
   }
 }
