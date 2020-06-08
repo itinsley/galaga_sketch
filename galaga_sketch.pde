@@ -287,7 +287,6 @@ void keyPressed() {
   
 }
 
-//Slight bug in here when keys are pressed at the same time
 void keyReleased() {
   if ((key=='a'||key=='A')&& playerDirection=='l'){
     playerDirection=' ';
