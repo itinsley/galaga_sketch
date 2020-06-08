@@ -13,6 +13,7 @@ AudioPlayer audioPlayer;
 PImage playerImage;
 PImage bulletImage;
 PImage alienShipImageDefault;
+PImage alienShipAttackerImageDefault;
 PImage alienExplosion1Image;
 PImage alienExplosion2Image;
 PImage alienExplosion3Image;
@@ -90,6 +91,13 @@ class PlayerBullet {
   }
 };
 
+class AlienShipAttacker extends AlienShip {
+  AlienShipAttacker(int x, int y) {
+    super(x,y);
+    this.defaultImage = alienShipAttackerImageDefault;
+  }
+}
+
 class AlienShip {
   int X;
   int Y;
@@ -99,10 +107,11 @@ class AlienShip {
 
   char direction='r';
   int explosionStep=0;
-  PImage alienShipImage;
-
+  PImage currentImage;
+  PImage defaultImage = alienShipImageDefault;
+  
   AlienShip(int x, int y) {
-    alienShipImage = alienShipImageDefault;
+    currentImage = defaultImage;
     X=x;
     Y=y;
   }
@@ -112,37 +121,11 @@ class AlienShip {
     score=score+1; //Shouldn't be updating globals here
   }
   float centreX() {
-    return (alienShipImage.width/2)+X;
+    return (currentImage.width/2)+X;
   }
 
   float centreY() {
-    return (alienShipImage.height/2)+Y;
-  }
-
-  void drawExplosion() {
-    switch(explosionStep) {
-    case 1: 
-      alienShipImage = alienExplosion1Image;
-      killSound.play();    
-      explosionStep++;
-      break;
-    case 2:
-      alienShipImage = alienExplosion2Image;
-      explosionStep++;
-      break;
-    case 3:
-      alienShipImage = alienExplosion3Image;
-      explosionStep++;
-      break;
-    case 4:
-      //Wait a cycle
-      explosionStep++;
-      break;
-    default:
-      alienShipImage = alienShipImageDefault; //Return to default just for now.
-      explosionStep=0;
-      break;
-    }
+    return (currentImage.height/2)+Y;
   }
 
   boolean isAlive() {
@@ -150,16 +133,37 @@ class AlienShip {
   }
 
   void draw() {
-    image(alienShipImage, X, Y);
-    drawExplosion();
+    image(currentImage, X, Y);
+    switch(explosionStep) {
+    case 1: 
+      currentImage = alienExplosion1Image;
+      killSound.play();    
+      explosionStep++;
+      break;
+    case 2:
+      currentImage = alienExplosion2Image;
+      explosionStep++;
+      break;
+    case 3:
+      currentImage = alienExplosion3Image;
+      explosionStep++;
+      break;
+    case 4:
+      //Wait a cycle
+      explosionStep++;
+      break;
+    default:
+      currentImage = defaultImage; //Return to default just for now.
+      explosionStep=0;
+      break;
+    }
   }
 
   void checkWall() {
-    println(X, screenSize-alienShipImage.width, direction);
-    if (X>screenSize-alienShipImage.width) {
+    if (X>screenSize-currentImage.width) {
       alienArmyChangeDirection('l');
     } 
-    if (X<0+alienShipImage.width) {
+    if (X<0+currentImage.width) {
       alienArmyChangeDirection('r');
     }
   }
@@ -190,9 +194,11 @@ void setup() {
   bulletImage = loadImage("graphics/player-bullet.png");
   playerImage = loadImage("graphics/galaga-player-ship.png");
   alienShipImageDefault = loadImage("graphics/alien-ship.png");
+  alienShipAttackerImageDefault = loadImage("graphics/alien-ship-attacker.png");
   alienExplosion1Image = loadImage("graphics/alien-explosion-1.png");
   alienExplosion2Image = loadImage("graphics/alien-explosion-2.png");
   alienExplosion3Image = loadImage("graphics/alien-explosion-3.png");
+  alienShips = new ArrayList<AlienShip>();
 
   minim = new Minim(this);  
   bulletSound = minim.loadFile("sound/8d82b5_Galaga_Firing_Sound_Effect.mp3");    
@@ -311,15 +317,15 @@ void detectCollision() {
       float distanceY = abs(alienShip.centreY()-playerBullet.centreY());
       if (distanceX< collisionThreshold && distanceY<collisionThreshold) {
         alienShip.hit();
+        playerBullets.remove(playerBullets.get(pbIdx));
         break;
       }
       if (!alienShip.isAlive()) {
         alienShips.remove(i);
-        playerBullets.remove(playerBullets.get(pbIdx));
+        break;
       }
     }
     if (playerBullet !=null && playerBullet.outOfScreen()) {
-      playerBullet=null;
       playerBullets.remove(playerBullets.get(pbIdx));
     }
   }
@@ -347,18 +353,27 @@ void initPlayerBullets() {
 
 /********* ALIENS *********/
 void initAlienArmy() {
-  alienShips = new ArrayList<AlienShip>();
+  int posY = createBatallion(200, "DEFAULT");
+  println("Added: "+ posY);
+  posY = createBatallion(posY, "ATTACK");
+}
+
+int createBatallion(int posY, String shipType){
   int posXMargin=20;
   int posYMargin = 20;
-  int posY = posYMargin;
   for (int row = 1; row <= 3; row++) {
     int posX = posXMargin;
     for (int col = 1; col <= 10; col++) {
-      alienShips.add(alienShip = new AlienShip(posX, posY));
+      if (shipType=="DEFAULT"){
+        alienShips.add(new AlienShip(posX, posY));
+      } else {
+        alienShips.add(new AlienShipAttacker(posX, posY));
+      }
       posX = posX + posXMargin;
     }
     posY=posY+posYMargin;
   }
+  return posY;
 }
 
 void drawAlienArmy() { 
