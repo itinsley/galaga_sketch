@@ -25,7 +25,9 @@ class Player {
   }
 
   void shoot() {
-    playerBullets.add(new PlayerBullet(X+6, Y-8));
+    if (playerBullets.size()<=5){
+      playerBullets.add(new PlayerBullet(X+6, Y-8));
+    }
   }
 
   // ********Movement***********
@@ -79,7 +81,10 @@ class PlayerBullet {
   float centreY() {
     return (img.height/2)+Y;
   }
-
+  
+  boolean outOfScreen(){
+    return Y<=0;
+  }
   void draw() {
     image(img, X, Y);
   }
@@ -179,7 +184,6 @@ void setup() {
   initAlienArmy();
   initPlayer();
   initPlayerBullets();
- 
   score=0;
 }
 
@@ -216,7 +220,6 @@ void gameScreen() {
   background(0);
   textAlign(LEFT);
   text("SCORE: "+score, 10, 10);
-
   player.draw();
   drawPlayerBullets();
   drawAlienArmy();
@@ -227,7 +230,6 @@ void gameScreen() {
 /********* INPUTS *********/
 void keyPressed() {
    gameScreen="START";
- 
   if (key=='a'||key=='A') {
     player.moveLeft();
   };
@@ -267,6 +269,9 @@ void detectCollision() {
       if (!alienShip.isAlive()) {
         alienShips.remove(i);
       }
+    }
+    if (playerBullet.outOfScreen()){
+      playerBullets.remove(playerBullet);
     }
   }
 }
@@ -311,7 +316,6 @@ void movePlayerBullet() {
 }
 
 void drawPlayerBullets() {
-  println("PlayerBullets size", playerBullets.size());
   for (PlayerBullet playerBullet : playerBullets) {
     playerBullet.draw();
   }
