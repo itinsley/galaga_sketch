@@ -147,8 +147,12 @@ class AlienShip {
   }
 
   void checkWall() {
+    println(X, screenSize-alienShipImage.width, direction);
     if (X>screenSize-alienShipImage.width) {
-      direction='l';
+      alienArmyChangeDirection('l');
+    } 
+    if (X<0+alienShipImage.width) {
+      alienArmyChangeDirection('r');
     }
   }
 
@@ -160,6 +164,10 @@ class AlienShip {
       X=X-1;
     }
     Y=Y+gravity;
+  }
+  
+  void changeDirection(char direction){
+    this.direction = direction;
   }
 };
 
@@ -313,7 +321,6 @@ void initAlienArmy() {
     }
     posY=posY+posYMargin;
   }
-
 }
 
 void drawAlienArmy() { 
@@ -323,6 +330,11 @@ void drawAlienArmy() {
   }
 }
 
+void alienArmyChangeDirection(char direction){
+  for (AlienShip alienShip : alienShips) {
+    alienShip.changeDirection(direction);
+  }
+}
 
 void movePlayerBullet() {
   for (PlayerBullet playerBullet : playerBullets) {
