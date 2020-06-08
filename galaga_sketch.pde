@@ -254,12 +254,13 @@ void detectCollision() {
       float distanceY = abs(alienShip.centreY()-playerBullet.centreY());
       if (distanceX< collisionThreshold && distanceY<collisionThreshold) {
         alienShip.hit();
+        playerBullets.remove(pbIdx);
       }
       if (!alienShip.isAlive()) {
         alienShips.remove(i);
       }
     }
-    if (playerBullet.outOfScreen()){
+    if (playerBullet !=null && playerBullet.outOfScreen()){
       playerBullets.remove(playerBullet);
     }
   }
