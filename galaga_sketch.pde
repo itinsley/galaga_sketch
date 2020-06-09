@@ -117,6 +117,7 @@ class AlienShip {
   }
 
   void hit() {
+    killSound.play();    
     explosionStep=1;
     score=score+1; //Shouldn't be updating globals here
   }
@@ -137,7 +138,6 @@ class AlienShip {
     switch(explosionStep) {
     case 1: 
       currentImage = alienExplosion1Image;
-      killSound.play();    
       explosionStep++;
       break;
     case 2:
