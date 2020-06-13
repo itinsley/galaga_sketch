@@ -141,63 +141,60 @@ class AlienShip {
 
   char direction='r';
   int explosionStep=0;
-  PImage currentImage;
+  //PImage currentImage;
   PImage defaultImage = alienShipImageDefault;
+  ArrayList<PImage>imageSequence;
   
   AlienShip(int x, int y) {
-    currentImage = defaultImage;
+    imageSequence = new ArrayList<PImage>(); 
+    imageSequence.add(defaultImage);
+    explosionStep=0;
     X=x;
     Y=y;
+    //imageSequence=new ArrayList<PImage>();
   }
-
+  
   void hit() {
     killSound.play();    
-    explosionStep=1;
     score=score+1; //Shouldn't be updating globals here
+    imageSequence.add(alienExplosion1Image);
+    imageSequence.add(alienExplosion2Image);
+    imageSequence.add(alienExplosion3Image);
+    explosionStep=1;
+  }
+  PImage currentImage(){
+    return imageSequence.get(explosionStep);
   }
   float centreX() {
-    return (currentImage.width/2)+X;
+    //println("step:", explosionStep);
+    //println(imageSequence.get(explosionStep));
+    return (currentImage().width/2)+X;
   }
 
   float centreY() {
-    return (currentImage.height/2)+Y;
+    return (currentImage().height/2)+Y;
   }
 
   boolean isAlive() {
-    return(explosionStep<4);
+    return(explosionStep<3);
   }
 
   void draw() {
-    image(currentImage, X, Y);
-    switch(explosionStep) {
-    case 1: 
-      currentImage = alienExplosion1Image;
-      explosionStep++;
-      break;
-    case 2:
-      currentImage = alienExplosion2Image;
-      explosionStep++;
-      break;
-    case 3:
-      currentImage = alienExplosion3Image;
-      explosionStep++;
-      break;
-    case 4:
-      //Wait a cycle
-      explosionStep++;
-      break;
-    default:
-      currentImage = defaultImage; //Return to default just for now.
-      explosionStep=0;
-      break;
+    image(currentImage(), X, Y);
+    if(explosionStep >= imageSequence.size()-1){
+      explosionStep=0;    
+    } else {
+      if (imageSequence.size()>1){
+        explosionStep++;
+      }
     }
   }
 
   void checkWall() {
-    if (X>screenSize-currentImage.width) {
+    if (X>screenSize-currentImage().width) {
       alienArmyChangeDirection('l');
     } 
-    if (X<0+currentImage.width) {
+    if (X<0+currentImage().width) {
       alienArmyChangeDirection('r');
     }
   }
@@ -390,7 +387,7 @@ void initPlayerBullets() {
 /********* ALIENS *********/
 void initAlienArmy() {
   int posY = createBatallion(200, "DEFAULT");
-  println("Added: "+ posY);
+  //println("Added: "+ posY);
   posY = createBatallion(posY, "ATTACK");
 }
 
