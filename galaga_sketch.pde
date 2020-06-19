@@ -176,13 +176,15 @@ class AlienShip {
   }
 
   boolean isAlive() {
-    return(explosionStep<3);
+    return(explosionStep<=2);
   }
 
   void draw() {
     image(currentImage(), X, Y);
     if(explosionStep >= imageSequence.size()-1){
-      explosionStep=0;    
+      explosionStep=0;
+      imageSequence = new ArrayList<PImage>(); 
+      imageSequence.add(defaultImage);
     } else {
       if (imageSequence.size()>1){
         explosionStep++;
@@ -236,7 +238,7 @@ void setup() {
   killSound = minim.loadFile("sound/8d82b5_Galaga_Kill_Enemy_Sound_Effect.mp3");
 
   size(500, 500);
-  frameRate(40);
+  frameRate(10);
   initAlienArmy();
   initPlayer();
   initPlayerBullets();
