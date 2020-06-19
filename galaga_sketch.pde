@@ -4,7 +4,9 @@ import ddf.minim.*;
 int screenSize = 500;
 int score=0;
 Player player;
-char playerDirection;
+boolean keyLeft;
+boolean keyRight;
+char keyDirectionLast;
 ArrayList<PlayerBullet> playerBullets;
 AlienShip alienShip;
 ArrayList<AlienShip> alienShips;
@@ -247,7 +249,14 @@ void gameScreen() {
   background(0);
   textAlign(LEFT);
   text("SCORE: "+score, 10, 10);
-  player.move(playerDirection);
+
+  if(keyLeft && keyRight){
+    player.move(keyDirectionLast);    
+  }else if (keyLeft && !keyRight) {
+    player.move('l');
+  }else if (!keyLeft && keyRight) {
+    player.move('r');
+  }
   player.draw();
   drawPlayerBullets();
   drawAlienArmy();
@@ -274,10 +283,12 @@ void keyPressed() {
   gameScreen="START";
 
   if (key=='a'||key=='A') {
-    playerDirection='l';
+    keyLeft=true;
+    keyDirectionLast='l';
   };
   if (key=='d'||key=='D') {
-    playerDirection='r';
+    keyRight=true;
+    keyDirectionLast='r';
   }   
   if (key==' ') {
     player.shoot();
@@ -292,11 +303,11 @@ void keyPressed() {
 }
 
 void keyReleased() {
-  if ((key=='a'||key=='A')&& playerDirection=='l') {
-    playerDirection=' ';
+  if (key=='a'||key=='A') {
+    keyLeft=false;
   } 
-  if ((key=='d'||key=='D')&& playerDirection=='r') {
-    playerDirection=' ';
+  if (key=='d'||key=='D') {
+    keyRight=false;
   }
 }
 
