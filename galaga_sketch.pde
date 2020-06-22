@@ -186,7 +186,11 @@ class AlienShipBase {
   void draw() {
     image(currentImage(), X, Y);
     if (imageSequence.size()>1){
-      eventStep++;
+      if (eventStep==3){
+        //Should never have got here.
+      }else{
+        eventStep++;
+      }
     }
   }
 
@@ -216,6 +220,13 @@ class AlienShipBase {
 
   void changeDirection(char direction) {
     this.direction = direction;
+  }
+  
+  void debug(){
+    println("DEBUG:");
+    println("eventStep:"+eventStep);
+    println("SequenceSize:"+imageSequence.size());
+    println("Event:"+currentEvent);
   }
 };
 
@@ -351,11 +362,7 @@ void detectCollision() {
         alienShip.hit();
         playerBullets.remove(playerBullets.get(pbIdx));
         break;
-      }
-      if (!alienShip.isAlive()) {
-        alienShips.remove(i);
-        break;
-      }
+      }          
     }
     if (playerBullet !=null && playerBullet.outOfScreen()) {
       playerBullets.remove(playerBullets.get(pbIdx));
@@ -365,6 +372,11 @@ void detectCollision() {
   //** Alien Ships
   for (int i = alienShips.size() - 1; i >= 0; i--) {
     AlienShipBase alienShip = alienShips.get(i);
+    // ** Is Dead?
+    if (!alienShip.isAlive()) {
+      alienShips.remove(i);
+      break;
+    }    
     // ** Hit Player?
     float distanceX = abs(alienShip.centreX()-player.centreX());
     float distanceY = abs(alienShip.centreY()-player.centreY());
