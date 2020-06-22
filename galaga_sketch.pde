@@ -7,7 +7,7 @@ Player player;
 PlayerController playerController;
 ArrayList<PlayerBullet> playerBullets;
 AlienShip alienShip;
-ArrayList<AlienShip> alienShips;
+ArrayList<AlienShipBase> alienShips;
 Minim minim;
 AudioPlayer audioPlayer;
 PImage playerImage;
@@ -125,13 +125,18 @@ class PlayerBullet {
   }
 };
 
-class AlienShipAttacker extends AlienShip {
+class AlienShip extends AlienShipBase {
+  AlienShip(int x, int y) {
+    super(x, y, alienShipImageDefault);
+  }
+}
+class AlienShipAttacker extends AlienShipBase {
   AlienShipAttacker(int x, int y) {
     super(x, y, alienShipAttackerImageDefault);
   }
 }
 
-class AlienShip {
+class AlienShipBase {
   int X;
   int Y;
   int descent=1;
@@ -146,7 +151,7 @@ class AlienShip {
   PImage defaultImage;
   ArrayList<PImage>imageSequence;
   
-  AlienShip(int x, int y, PImage defaultImage) {
+  AlienShipBase(int x, int y, PImage defaultImage) {
     this.defaultImage = defaultImage;
     imageSequence = new ArrayList<PImage>(); 
     imageSequence.add(this.defaultImage);
@@ -224,7 +229,7 @@ void setup() {
   alienExplosion1Image = loadImage("graphics/alien-explosion-1.png");
   alienExplosion2Image = loadImage("graphics/alien-explosion-2.png");
   alienExplosion3Image = loadImage("graphics/alien-explosion-3.png");
-  alienShips = new ArrayList<AlienShip>();
+  alienShips = new ArrayList<AlienShipBase>();
 
   minim = new Minim(this);  
   bulletSound = minim.loadFile("sound/8d82b5_Galaga_Firing_Sound_Effect.mp3");    
@@ -339,7 +344,7 @@ void detectCollision() {
 
     //Iterate backwards as we may be removing
     for (int i = alienShips.size() - 1; i >= 0; i--) {
-      AlienShip alienShip = alienShips.get(i);
+      AlienShipBase alienShip = alienShips.get(i);
       float distanceX = abs(alienShip.centreX()-playerBullet.centreX());
       float distanceY = abs(alienShip.centreY()-playerBullet.centreY());
       if (distanceX< collisionThreshold && distanceY<collisionThreshold) {
@@ -359,7 +364,7 @@ void detectCollision() {
 
   //** Alien Ships
   for (int i = alienShips.size() - 1; i >= 0; i--) {
-    AlienShip alienShip = alienShips.get(i);
+    AlienShipBase alienShip = alienShips.get(i);
     // ** Hit Player?
     float distanceX = abs(alienShip.centreX()-player.centreX());
     float distanceY = abs(alienShip.centreY()-player.centreY());
@@ -393,7 +398,7 @@ int createBatallion(int posY, String shipType){
     int posX = posXMargin;
     for (int col = 1; col <= 10; col++) {
       if (shipType=="DEFAULT"){
-        alienShips.add(new AlienShip(posX, posY, alienShipImageDefault));
+        alienShips.add(new AlienShip(posX, posY));
       } else {
         alienShips.add(new AlienShipAttacker(posX, posY));
       }
@@ -408,14 +413,14 @@ int createBatallion(int posY, String shipType){
 }
 
 void drawAlienArmy() { 
-  for (AlienShip alienShip : alienShips) {
+  for (AlienShipBase alienShip : alienShips) {
     alienShip.move();
     alienShip.draw();
   }
 }
 
 void alienArmyChangeDirection(char direction) {
-  for (AlienShip alienShip : alienShips) {
+  for (AlienShipBase alienShip : alienShips) {
     alienShip.changeDirection(direction);
   }
 }
