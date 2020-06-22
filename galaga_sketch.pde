@@ -127,8 +127,7 @@ class PlayerBullet {
 
 class AlienShipAttacker extends AlienShip {
   AlienShipAttacker(int x, int y) {
-    super(x,y);
-    this.defaultImage = alienShipAttackerImageDefault;
+    super(x, y, alienShipAttackerImageDefault);
   }
 }
 
@@ -140,14 +139,18 @@ class AlienShip {
   int descentRate=2;
 
   char direction='r';
-  int explosionStep=0;
-  PImage defaultImage = alienShipImageDefault;
+  int currentEvent=0;
+  boolean isAlive=true;
+
+    int eventStep=0;
+  PImage defaultImage;
   ArrayList<PImage>imageSequence;
   
-  AlienShip(int x, int y) {
+  AlienShip(int x, int y, PImage defaultImage) {
+    this.defaultImage = defaultImage;
     imageSequence = new ArrayList<PImage>(); 
-    imageSequence.add(defaultImage);
-    explosionStep=0;
+    imageSequence.add(this.defaultImage);
+    eventStep=0;
     X=x;
     Y=y;
   }
@@ -158,10 +161,10 @@ class AlienShip {
     imageSequence.add(alienExplosion1Image);
     imageSequence.add(alienExplosion2Image);
     imageSequence.add(alienExplosion3Image);
-    explosionStep=1;
+    eventStep=1;
   }
   PImage currentImage(){
-    return imageSequence.get(explosionStep);
+    return imageSequence.get(eventStep);
   }
   float centreX() {
     return (currentImage().width/2)+X;
@@ -172,19 +175,13 @@ class AlienShip {
   }
 
   boolean isAlive() {
-    return(explosionStep<=2);
+    return(eventStep<=2);
   }
 
   void draw() {
     image(currentImage(), X, Y);
-    if(explosionStep >= imageSequence.size()-1){
-      explosionStep=0;
-      imageSequence = new ArrayList<PImage>(); 
-      imageSequence.add(defaultImage);
-    } else {
-      if (imageSequence.size()>1){
-        explosionStep++;
-      }
+    if (imageSequence.size()>1){
+      eventStep++;
     }
   }
 
@@ -396,7 +393,7 @@ int createBatallion(int posY, String shipType){
     int posX = posXMargin;
     for (int col = 1; col <= 10; col++) {
       if (shipType=="DEFAULT"){
-        alienShips.add(new AlienShip(posX, posY));
+        alienShips.add(new AlienShip(posX, posY, alienShipImageDefault));
       } else {
         alienShips.add(new AlienShipAttacker(posX, posY));
       }
@@ -404,6 +401,9 @@ int createBatallion(int posY, String shipType){
     }
     posY=posY+posYMargin;
   }
+  //DEBUG 1 ship
+  //int posX = posXMargin;
+  //alienShips.add(new AlienShip(posX, posY));
   return posY;
 }
 
