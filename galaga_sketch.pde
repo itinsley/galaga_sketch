@@ -4,9 +4,7 @@ import ddf.minim.*;
 int screenSize = 500;
 int score=0;
 Player player;
-boolean keyLeft;
-boolean keyRight;
-char keyDirectionLast;
+PlayerController playerController;
 ArrayList<PlayerBullet> playerBullets;
 AlienShip alienShip;
 ArrayList<AlienShip> alienShips;
@@ -59,6 +57,40 @@ class Player {
   }
 };
 
+class PlayerController{
+  Player player;
+  boolean isLeft;
+  boolean isRight;
+  char directionDefault;
+  
+  PlayerController(Player player){
+    this.player = player;
+  }
+  
+  void leftKeyPressed(){
+    isLeft=true;
+    directionDefault='r';
+  }
+  void leftKeyReleased(){
+    isLeft=false;
+    directionDefault='l';
+  }
+  void rightDown(){
+    isRight=true;  
+  }
+  void rightUp(){
+    isRight=false;
+  }
+  void move(){
+    if(isLeft && isRight){
+      player.move(directionDefault);    
+    }else if (isLeft && !isRight) {
+      player.move('l');
+    }else if (!isLeft && isRight) {
+      player.move('r');
+    }
+  }
+}
 
 
 class PlayerBullet {
@@ -250,13 +282,7 @@ void gameScreen() {
   textAlign(LEFT);
   text("SCORE: "+score, 10, 10);
 
-  if(keyLeft && keyRight){
-    player.move(keyDirectionLast);    
-  }else if (keyLeft && !keyRight) {
-    player.move('l');
-  }else if (!keyLeft && keyRight) {
-    player.move('r');
-  }
+  playerController.move();
   player.draw();
   drawPlayerBullets();
   drawAlienArmy();
@@ -283,12 +309,10 @@ void keyPressed() {
   gameScreen="START";
 
   if (key=='a'||key=='A') {
-    keyLeft=true;
-    keyDirectionLast='l';
+    playerController.leftKeyPressed();
   };
   if (key=='d'||key=='D') {
-    keyRight=true;
-    keyDirectionLast='r';
+    playerController.rightDown();
   }   
   if (key==' ') {
     player.shoot();
@@ -304,10 +328,10 @@ void keyPressed() {
 
 void keyReleased() {
   if (key=='a'||key=='A') {
-    keyLeft=false;
+    playerController.leftKeyReleased();
   } 
   if (key=='d'||key=='D') {
-    keyRight=false;
+    playerController.rightUp();
   }
 }
 
@@ -356,6 +380,7 @@ void detectCollision() {
 /********* PLAYER *********/
 void initPlayer() {
   player = new Player();
+  playerController = new PlayerController(player);
 }
 
 void initPlayerBullets() {
