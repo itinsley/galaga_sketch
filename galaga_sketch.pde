@@ -141,7 +141,6 @@ class AlienShip {
 
   char direction='r';
   int explosionStep=0;
-  //PImage currentImage;
   PImage defaultImage = alienShipImageDefault;
   ArrayList<PImage>imageSequence;
   
@@ -151,7 +150,6 @@ class AlienShip {
     explosionStep=0;
     X=x;
     Y=y;
-    //imageSequence=new ArrayList<PImage>();
   }
   
   void hit() {
@@ -166,8 +164,6 @@ class AlienShip {
     return imageSequence.get(explosionStep);
   }
   float centreX() {
-    //println("step:", explosionStep);
-    //println(imageSequence.get(explosionStep));
     return (currentImage().width/2)+X;
   }
 
