@@ -3,6 +3,8 @@ import ddf.minim.*;
 /********* VARIABLES *********/
 int screenSize = 500;
 int score=0;
+int playerCollisionThreshold=15;
+
 Player player;
 PlayerController playerController;
 ArrayList<PlayerBullet> playerBullets;
@@ -163,10 +165,12 @@ class AlienShipBase {
   void hit() {
     killSound.play();    
     score=score+1; //Shouldn't be updating globals here
+    imageSequence = new ArrayList<PImage>();
     imageSequence.add(alienExplosion1Image);
     imageSequence.add(alienExplosion2Image);
     imageSequence.add(alienExplosion3Image);
-    eventStep=1;
+    print(imageSequence.size());
+    eventStep=0;
   }
   PImage currentImage(){
     return imageSequence.get(eventStep);
@@ -180,17 +184,14 @@ class AlienShipBase {
   }
 
   boolean isAlive() {
-    return(eventStep<=2);
+    return(eventStep<=1);
   }
 
   void draw() {
     image(currentImage(), X, Y);
+    //Move to next image if there is more than one image in sequence
     if (imageSequence.size()>1){
-      if (eventStep==3){
-        //Should never have got here.
-      }else{
-        eventStep++;
-      }
+      eventStep++;
     }
   }
 
@@ -247,7 +248,7 @@ void setup() {
   killSound = minim.loadFile("sound/8d82b5_Galaga_Kill_Enemy_Sound_Effect.mp3");
 
   size(500, 500);
-  frameRate(10);
+  frameRate(30);
   initAlienArmy();
   initPlayer();
   initPlayerBullets();
@@ -346,7 +347,6 @@ void keyReleased() {
 /********* COLLISIONS *********/
 void detectCollision() {
   int collisionThreshold=5;
-  int playerCollisionThreshold=15;
 
   //** Bullets **
   //Iterate backwards as we may be removing
@@ -366,23 +366,6 @@ void detectCollision() {
     }
     if (playerBullet !=null && playerBullet.outOfScreen()) {
       playerBullets.remove(playerBullets.get(pbIdx));
-    }
-  }
-
-  //** Alien Ships
-  for (int i = alienShips.size() - 1; i >= 0; i--) {
-    AlienShipBase alienShip = alienShips.get(i);
-    // ** Is Dead?
-    if (!alienShip.isAlive()) {
-      alienShips.remove(i);
-      break;
-    }    
-    // ** Hit Player?
-    float distanceX = abs(alienShip.centreX()-player.centreX());
-    float distanceY = abs(alienShip.centreY()-player.centreY());
-    if (distanceX< playerCollisionThreshold && distanceY<playerCollisionThreshold) {
-      gameScreen="GAMEOVER";
-      break;
     }
   }
 }
@@ -424,10 +407,23 @@ int createBatallion(int posY, String shipType){
   return posY;
 }
 
-void drawAlienArmy() { 
-  for (AlienShipBase alienShip : alienShips) {
+void drawAlienArmy() {
+  //** Alien Ships
+  for (int i = alienShips.size() - 1; i >= 0; i--) {
+    AlienShipBase alienShip = alienShips.get(i);
     alienShip.move();
     alienShip.draw();
+    if (!alienShip.isAlive()) {
+      alienShips.remove(i);
+    }
+        
+    // ** Hit Player?
+    float distanceX = abs(alienShip.centreX()-player.centreX());
+    float distanceY = abs(alienShip.centreY()-player.centreY());
+    if (distanceX< playerCollisionThreshold && distanceY<playerCollisionThreshold) {
+      gameScreen="GAMEOVER";
+      break;
+    }
   }
 }
 
