@@ -2,12 +2,13 @@ import ddf.minim.*;
 
 
 /********* CONSTANTS *********/
-int GROUND_LEVEL_Y=483;
+int GROUND_LEVEL_Y=470;
 
 /********* VARIABLES *********/
 int screenSize = 500;
 int score=0;
 int playerCollisionThreshold=15;
+boolean dying =false;
 
 Player player;
 PlayerController playerController;
@@ -23,17 +24,43 @@ PImage alienShipAttackerImageDefault;
 PImage alienExplosion1Image;
 PImage alienExplosion2Image;
 PImage alienExplosion3Image;
+PImage playerExplosionImage1;
+PImage playerExplosionImage2;
+PImage playerExplosionImage3;
+PImage playerExplosionImage4;
 
 AudioPlayer bulletSound;
 AudioPlayer killSound;
+AudioPlayer playerDeathSound;
+
 
 class Player {
   int X = 242;
   int Y = GROUND_LEVEL_Y;
   int velocity=4;
+  int eventStep;
+  ArrayList<PImage>imageSequence;
+  PImage defaultImage = playerImage;
 
   Player() {
     image(playerImage, X, Y);
+    imageSequence = new ArrayList<PImage>(); 
+    imageSequence.add(this.defaultImage);  
+  }
+
+  void hit() {
+    playerDeathSound.play();    
+    imageSequence = new ArrayList<PImage>();
+    imageSequence.add(playerExplosionImage1);
+    imageSequence.add(playerExplosionImage2);
+    imageSequence.add(playerExplosionImage3);
+    imageSequence.add(playerExplosionImage4);
+    dying=true;
+    eventStep=0;
+  }
+  
+  PImage currentImage(){
+    return imageSequence.get(eventStep);
   }
 
   float centreX() {
@@ -58,8 +85,17 @@ class Player {
       X=X+velocity;
     }
   }
-  void draw() {
-    image(playerImage, X, Y);
+  
+  void draw(){
+    image(currentImage(), X, Y);
+    //Move to next image if there is more than one image in sequence
+    if (imageSequence.size()>1){
+      if (eventStep>=3){
+        //Only event in town is the explosion
+        gameScreen="GAMEOVER";
+      }
+      eventStep++;
+    }
   }
 };
 
@@ -153,7 +189,7 @@ class AlienShipBase {
   int currentEvent=0;
   boolean isAlive=true;
 
-    int eventStep=0;
+  int eventStep=0;
   PImage defaultImage;
   ArrayList<PImage>imageSequence;
   
@@ -173,7 +209,6 @@ class AlienShipBase {
     imageSequence.add(alienExplosion1Image);
     imageSequence.add(alienExplosion2Image);
     imageSequence.add(alienExplosion3Image);
-    print(imageSequence.size());
     eventStep=0;
   }
   PImage currentImage(){
@@ -207,7 +242,7 @@ class AlienShipBase {
       alienArmyChangeDirection('r');
     }
     if (Y>=GROUND_LEVEL_Y){
-      gameScreen="GAMEOVER";
+      player.hit();
     }    
   }
 
@@ -248,12 +283,16 @@ void setup() {
   alienExplosion1Image = loadImage("graphics/alien-explosion-1.png");
   alienExplosion2Image = loadImage("graphics/alien-explosion-2.png");
   alienExplosion3Image = loadImage("graphics/alien-explosion-3.png");
+  playerExplosionImage1 = loadImage("graphics/galaga-player-ship-explosion-1.png");
+  playerExplosionImage2 = loadImage("graphics/galaga-player-ship-explosion-2.png");
+  playerExplosionImage3 = loadImage("graphics/galaga-player-ship-explosion-3.png");
+  playerExplosionImage4 = loadImage("graphics/galaga-player-ship-explosion-4.png");
   alienShips = new ArrayList<AlienShipBase>();
 
   minim = new Minim(this);  
   bulletSound = minim.loadFile("sound/8d82b5_Galaga_Firing_Sound_Effect.mp3");    
   killSound = minim.loadFile("sound/8d82b5_Galaga_Kill_Enemy_Sound_Effect.mp3");
-
+  playerDeathSound = minim.loadFile("sound/player-explosion.wav");
   size(500, 500);
   frameRate(30);
   initAlienArmy();
@@ -300,10 +339,12 @@ void gameScreen() {
 
   playerController.move();
   player.draw();
-  drawPlayerBullets();
-  drawAlienArmy();
-  movePlayerBullet();
-  detectCollision();
+  if (!dying){
+    drawPlayerBullets();
+    drawAlienArmy();
+    movePlayerBullet();
+    detectCollision();
+  }
   //long maxMemory = Runtime.getRuntime().maxMemory();
   //long allocatedMemory = Runtime.getRuntime().totalMemory();
   //long freeMemory = Runtime.getRuntime().freeMemory();
@@ -334,6 +375,7 @@ void keyPressed() {
     player.shoot();
   }
   if (key=='q'||key=='Q') {
+    dying=false;
     setup();
   }
 
@@ -389,7 +431,6 @@ void initPlayerBullets() {
 /********* ALIENS *********/
 void initAlienArmy() {
   int posY = createBatallion(200, "DEFAULT");
-  //println("Added: "+ posY);
   posY = createBatallion(posY, "ATTACK");
 }
 
@@ -428,8 +469,7 @@ void drawAlienArmy() {
     float distanceX = abs(alienShip.centreX()-player.centreX());
     float distanceY = abs(alienShip.centreY()-player.centreY());
     if (distanceX< playerCollisionThreshold && distanceY<playerCollisionThreshold) {
-      gameScreen="GAMEOVER";
-      break;
+      player.hit();
     }
   }
 }
