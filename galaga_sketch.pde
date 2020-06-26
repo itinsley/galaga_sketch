@@ -1,5 +1,9 @@
 import ddf.minim.*;
 
+
+/********* CONSTANTS *********/
+int GROUND_LEVEL_Y=483;
+
 /********* VARIABLES *********/
 int screenSize = 500;
 int score=0;
@@ -25,7 +29,7 @@ AudioPlayer killSound;
 
 class Player {
   int X = 242;
-  int Y = 483;
+  int Y = GROUND_LEVEL_Y;
   int velocity=4;
 
   Player() {
@@ -202,6 +206,9 @@ class AlienShipBase {
     if (X<0+currentImage().width) {
       alienArmyChangeDirection('r');
     }
+    if (Y>=GROUND_LEVEL_Y){
+      gameScreen="GAMEOVER";
+    }    
   }
 
   void move() {
