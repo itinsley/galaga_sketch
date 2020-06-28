@@ -215,7 +215,7 @@ class AlienShipBase {
   int Y;
   int descent=1;
   int descentCounter;
-  int descentRate=2;
+  int descentRate=3;
   boolean deathOnLanding=true;
 
   char direction='r';
@@ -260,14 +260,17 @@ class AlienShipBase {
   }
 
   boolean isAlive() {
-    return(eventStep<=1);
+    return isAlive;
   }
 
   void draw() {
     image(currentImage(), X, Y);
     //Move to next image if there is more than one image in sequence
-    if (imageSequence.size()>1){
+    if (imageSequence.size()>1){      
       eventStep++;
+      if(eventStep<=1){
+        isAlive=false;
+      }
     }
   }
 
@@ -278,8 +281,12 @@ class AlienShipBase {
     if (X<0+currentImage().width) {
       alienArmyChangeDirection('r');
     }
-    if (Y>=GROUND_LEVEL_Y && this.deathOnLanding()==true){
-      player.hit();
+    if (Y>=GROUND_LEVEL_Y){
+      if (this.deathOnLanding()==true){
+        player.hit();
+      } else {
+        isAlive=false;
+      }
     }    
   }
 
