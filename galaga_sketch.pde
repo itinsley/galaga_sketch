@@ -310,6 +310,21 @@ void setup() {
 String gameScreen = "INSTRUCTIONS";
 
 void draw() {
+  
+    Point origin = new Point(1,1);
+    Point destination = new Point(300,300);
+    Point control1 = new Point (50,200);
+    Point control2 = new Point (200,50);
+    stroke(204);
+    strokeWeight(5);
+    strokeCap(ROUND);
+    ArrayList<Point> results = generateBezierPath(origin, destination, control1, control2, 10);
+    for (Point p: results){
+      println(p.x +", "+p.y);
+      point((float)p.x, (float) p.y);
+    }
+
+  
   switch(gameScreen) {
   case "INSTRUCTIONS": 
     initScreen();
@@ -330,7 +345,7 @@ void initScreen() {
   text("Q to restart", width/2, height/2+50);
   text("A = Move Left | D= Move Right | SPACE=Fire", width/2, height/2+100);
   audioPlayer = minim.loadFile("sound/8d82b5_Galaga_Theme_Song.mp3");
-  audioPlayer.play();
+  //audioPlayer.play();
 }
 void gameScreen() {
   background(0);
@@ -380,8 +395,35 @@ void keyPressed() {
   }
 
   if (key=='x'||key=='X') {
-    //debug
+    //debug     
   }
+}
+
+class Point{
+  double x;
+  double y;
+  Point(){};
+  Point(double x, double y){
+    this.x=x;
+    this.y=y;
+  }
+  public void setX(double x){this.x = x;}
+  public void setY(double y){this.y = y;}
+}
+
+ArrayList<Point> generateBezierPath(Point origin, Point destination, Point control1, Point control2, int segments) {
+    ArrayList<Point> pointsForReturn = new ArrayList<Point>();
+
+    float t = 0;
+    for (int i = 0; i < segments; i++) {
+        Point p = new Point();
+        p.setX(Math.pow(1 - t, 3) * origin.x + 3.0f * Math.pow(1 - t, 2) * t * control1.x + 3.0f * (1 - t) * t * t * control2.x + t * t * t * destination.x);
+        p.setY(Math.pow(1 - t, 3) * origin.y + 3.0f * Math.pow(1 - t, 2) * t * control1.y + 3.0f * (1 - t) * t * t * control2.y + t * t * t * destination.y);
+        t += 1.0f / segments;
+        pointsForReturn.add(p);
+    }
+    pointsForReturn.add(destination);
+    return pointsForReturn;
 }
 
 void keyReleased() {
