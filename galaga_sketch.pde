@@ -197,18 +197,17 @@ class AlienShipAttacker extends AlienShipBase {
       }
     }
   }
-  
+    
   void attack(){
     if (attackPath==null){
       Point origin = new Point(X,Y);
       Point destination = new Point(player.X, player.Y);
-      //Point leftControl = new Point(X/2,Y/2);
       Point leftControl = new Point(player.X,250);
-      //Point rightControl = new Point (screenSize-X,Y/2);
       Point rightControl = new Point(player.X,50);      
       attackPath = generateBezierPath(origin, destination, leftControl, rightControl, player.Y-Y);
+      deathOnLanding=false;
     }
-  }
+  }  
 }
 
 class AlienShipBase {
@@ -217,6 +216,7 @@ class AlienShipBase {
   int descent=1;
   int descentCounter;
   int descentRate=2;
+  boolean deathOnLanding=true;
 
   char direction='r';
   int currentEvent=0;
@@ -233,6 +233,10 @@ class AlienShipBase {
     eventStep=0;
     X=x;
     Y=y;
+  }
+  
+  boolean deathOnLanding(){
+    return deathOnLanding;
   }
   
   void hit() {
@@ -274,7 +278,7 @@ class AlienShipBase {
     if (X<0+currentImage().width) {
       alienArmyChangeDirection('r');
     }
-    if (Y>=GROUND_LEVEL_Y){
+    if (Y>=GROUND_LEVEL_Y && this.deathOnLanding()==true){
       player.hit();
     }    
   }
