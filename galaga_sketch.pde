@@ -3,6 +3,7 @@ import ddf.minim.*;
 
 /********* CONSTANTS *********/
 int GROUND_LEVEL_Y=470;
+int BULLETS_LIMIT=10;
 
 /********* VARIABLES *********/
 int screenSize = 500;
@@ -72,7 +73,7 @@ class Player {
   }
 
   void shoot() {
-    if (playerBullets.size()<=5) {
+    if (playerBullets.size()<=BULLETS_LIMIT) {
       playerBullets.add(new PlayerBullet(X+6, Y-8));
     }
   }
@@ -173,8 +174,40 @@ class AlienShip extends AlienShipBase {
   }
 }
 class AlienShipAttacker extends AlienShipBase {
+  
+  ArrayList<Point> attackPath;
+  int attackPathPos=0;
+  
   AlienShipAttacker(int x, int y) {
     super(x, y, alienShipAttackerImageDefault);
+  }
+  
+  void move() {
+    if (attackPath==null){
+      super.move();
+    } else {
+      checkWall();
+      if (attackPathPos>=attackPath.size()){
+        attackPath=null;
+      } else{
+        Point point = attackPath.get(attackPathPos);
+        Y=(int)point.getY();
+        X=(int)point.getX();
+        attackPathPos++;
+      }
+    }
+  }
+  
+  void attack(){
+    if (attackPath==null){
+      Point origin = new Point(X,Y);
+      Point destination = new Point(player.X, player.Y);
+      //Point leftControl = new Point(X/2,Y/2);
+      Point leftControl = new Point(player.X,250);
+      //Point rightControl = new Point (screenSize-X,Y/2);
+      Point rightControl = new Point(player.X,50);      
+      attackPath = generateBezierPath(origin, destination, leftControl, rightControl, player.Y-Y);
+    }
   }
 }
 
@@ -289,6 +322,11 @@ void setup() {
   playerExplosionImage4 = loadImage("graphics/galaga-player-ship-explosion-4.png");
   alienShips = new ArrayList<AlienShipBase>();
 
+  //AlienShip Attack Vectors
+  YVectors.add(220);
+  YVectors.add(260);
+  YVectors.add(300);
+
   minim = new Minim(this);  
   bulletSound = minim.loadFile("sound/8d82b5_Galaga_Firing_Sound_Effect.mp3");    
   killSound = minim.loadFile("sound/8d82b5_Galaga_Kill_Enemy_Sound_Effect.mp3");
@@ -310,20 +348,6 @@ void setup() {
 String gameScreen = "INSTRUCTIONS";
 
 void draw() {
-  
-    Point origin = new Point(1,1);
-    Point destination = new Point(300,300);
-    Point control1 = new Point (50,200);
-    Point control2 = new Point (200,50);
-    stroke(204);
-    strokeWeight(5);
-    strokeCap(ROUND);
-    ArrayList<Point> results = generateBezierPath(origin, destination, control1, control2, 10);
-    for (Point p: results){
-      println(p.x +", "+p.y);
-      point((float)p.x, (float) p.y);
-    }
-
   
   switch(gameScreen) {
   case "INSTRUCTIONS": 
@@ -357,6 +381,7 @@ void gameScreen() {
   if (!dying){
     drawPlayerBullets();
     drawAlienArmy();
+    alienArmyAttackController();
     movePlayerBullet();
     detectCollision();
   }
@@ -395,7 +420,7 @@ void keyPressed() {
   }
 
   if (key=='x'||key=='X') {
-    //debug     
+    ((AlienShipAttacker) alienShips.get(50)).attack();
   }
 }
 
@@ -409,6 +434,8 @@ class Point{
   }
   public void setX(double x){this.x = x;}
   public void setY(double y){this.y = y;}
+  public double getX(){return this.x;}
+  public double getY(){return this.y;}
 }
 
 ArrayList<Point> generateBezierPath(Point origin, Point destination, Point control1, Point control2, int segments) {
@@ -495,6 +522,22 @@ int createBatallion(int posY, String shipType){
   //int posX = posXMargin;
   //alienShips.add(new AlienShip(posX, posY));
   return posY;
+}
+
+ArrayList<Integer> YVectors = new ArrayList<Integer>();
+  
+void alienArmyAttackController(){
+  
+  for (int i = YVectors.size() - 1; i >= 0; i--) {
+    if (YVectors.get(i) == alienShips.get(0).Y){
+      float r = random(0, alienShips.size());
+      AlienShipBase ship = alienShips.get((int)r);
+      if(ship instanceof AlienShipAttacker){
+        ((AlienShipAttacker) ship).attack();
+        YVectors.remove(i);
+      }
+    }
+  }
 }
 
 void drawAlienArmy() {
