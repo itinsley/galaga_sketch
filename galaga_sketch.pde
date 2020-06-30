@@ -202,8 +202,8 @@ class AlienShipAttacker extends AlienShipBase {
     if (attackPath==null){
       Point origin = new Point(X,Y);
       Point destination = new Point(player.X, player.Y);
-      Point leftControl = new Point(player.X,250);
-      Point rightControl = new Point(player.X,50);      
+      Point leftControl = new Point(player.X-50, 50);
+      Point rightControl = new Point(player.X+50, 50);      
       attackPath = generateBezierPath(origin, destination, leftControl, rightControl, player.Y-Y);
       deathOnLanding=false;
     }
@@ -334,9 +334,9 @@ void setup() {
   alienShips = new ArrayList<AlienShipBase>();
 
   //AlienShip Attack Vectors
-  YVectors.add(220);
-  YVectors.add(260);
-  YVectors.add(300);
+  for(int i=200;i<=320;i=i+5){
+    YVectors.add(i);
+  }
 
   minim = new Minim(this);  
   bulletSound = minim.loadFile("sound/8d82b5_Galaga_Firing_Sound_Effect.mp3");    
