@@ -22,6 +22,10 @@ class PlayerController {
   void rightUp() {
     isRight=false;
   }
+  void guide(){
+    this.move();
+    player.draw();
+  }
   void move() {
     if (isLeft && isRight) {
       player.move(directionDefault);

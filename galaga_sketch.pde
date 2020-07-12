@@ -12,7 +12,7 @@ int playerCollisionThreshold=15;
 boolean dying =false;
 
 Player gPlayer;
-PlayerController playerController;
+PlayerController gPlayerController;
 ArrayList<PlayerBullet> gPlayerBullets;
 ArrayList<AlienShipBase> gAlienShips;
 Minim gMinim;
@@ -81,8 +81,7 @@ void gameScreen() {
   textAlign(LEFT);
   text("SCORE: "+score, 10, 10);
 
-  playerController.move();
-  gPlayer.draw();
+  gPlayerController.guide();
   if (!dying) {
     drawPlayerBullets();
     drawAlienArmy();
@@ -111,10 +110,10 @@ void keyPressed() {
   gameScreen="START";
 
   if (key=='a'||key=='A') {
-    playerController.leftKeyPressed();
+    gPlayerController.leftKeyPressed();
   };
   if (key=='d'||key=='D') {
-    playerController.rightDown();
+    gPlayerController.rightDown();
   }   
   if (key==' ') {
     gPlayer.shoot();
@@ -131,10 +130,10 @@ void keyPressed() {
 
 void keyReleased() {
   if (key=='a'||key=='A') {
-    playerController.leftKeyReleased();
+    gPlayerController.leftKeyReleased();
   } 
   if (key=='d'||key=='D') {
-    playerController.rightUp();
+    gPlayerController.rightUp();
   }
 }
 
@@ -166,7 +165,7 @@ void detectCollision() {
 /********* PLAYER *********/
 void initPlayer() {
   gPlayer = new Player();
-  playerController = new PlayerController(gPlayer);
+  gPlayerController = new PlayerController(gPlayer);
 }
 
 void initPlayerBullets() {
