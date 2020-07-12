@@ -21,14 +21,15 @@ AlienShipController gAlienShipController;
 
 void setup() {
   loadAssets();
+  gPlayer = new Player();
+  gPlayerController = new PlayerController(gPlayer);
+  gPlayerBullets = new ArrayList<PlayerBullet>();
   gAlienShips = new ArrayList<AlienShipBase>();
-  gAlienShipController = new AlienShipController(gAlienShips);
+  gAlienShipController = new AlienShipController(gAlienShips, gPlayer);
 
   size(500, 500);
   frameRate(30);
   initAlienArmy();
-  initPlayer();
-  initPlayerBullets();
   score=0;
 }
 
@@ -68,7 +69,6 @@ void gameScreen() {
 
   gPlayerController.guide();
   if (!dying) {
-    drawAlienArmy();
     gAlienShipController.guide();
     movePlayerBullet();
     detectCollision();
@@ -146,39 +146,11 @@ void detectCollision() {
     }
   }
 }
-/********* PLAYER *********/
-void initPlayer() {
-  gPlayer = new Player();
-  gPlayerController = new PlayerController(gPlayer);
-}
-
-void initPlayerBullets() {
-  gPlayerBullets = new ArrayList<PlayerBullet>();
-}
 
 /********* ALIENS *********/
 void initAlienArmy() {
   int posY = gAlienShipController.createBatallion(200, "DEFAULT");
   posY = gAlienShipController.createBatallion(posY, "ATTACK");
-}
-
-void drawAlienArmy() {
-  //** Alien Ships
-  for (int i = gAlienShips.size() - 1; i >= 0; i--) {
-    AlienShipBase alienShip = gAlienShips.get(i);
-    alienShip.move();
-    alienShip.draw();
-    if (!alienShip.isAlive()) {
-      gAlienShips.remove(i);
-    }
-
-    // ** Hit Player?
-    float distanceX = abs(alienShip.centreX()-gPlayer.centreX());
-    float distanceY = abs(alienShip.centreY()-gPlayer.centreY());
-    if (distanceX< playerCollisionThreshold && distanceY<playerCollisionThreshold) {
-      gPlayer.hit();
-    }
-  }
 }
 
 void alienArmyChangeDirection(char direction) {

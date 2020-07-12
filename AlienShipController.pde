@@ -1,9 +1,11 @@
 class AlienShipController {
   ArrayList<Integer> YVectors = new ArrayList<Integer>();
   ArrayList<AlienShipBase> alienShips;
+  Player player;
 
-  AlienShipController(ArrayList<AlienShipBase> alienShips) {
+  AlienShipController(ArrayList<AlienShipBase> alienShips, Player player) {
     this.alienShips=alienShips;
+    this.player = player;
 
     //Points at which to attack
     for (int i=200; i<=320; i=i+5) {
@@ -12,6 +14,7 @@ class AlienShipController {
   }
 
   public void guide() {  
+    draw();
     for (int i = YVectors.size() - 1; i >= 0; i--) {
       if (YVectors.get(i) == alienShips.get(0).Y) {
         float r = random(0, alienShips.size());
@@ -20,6 +23,25 @@ class AlienShipController {
           ((AlienShipAttacker) ship).attack();
           YVectors.remove(i);
         }
+      }
+    }
+  }
+  
+  private void draw(){
+    //** Alien Ships
+    for (int i = alienShips.size() - 1; i >= 0; i--) {
+      AlienShipBase alienShip = alienShips.get(i);
+      alienShip.move();
+      alienShip.draw();
+      if (!alienShip.isAlive()) {
+        alienShips.remove(i);
+      }
+  
+      // ** Hit Player?
+      float distanceX = abs(alienShip.centreX()-player.centreX());
+      float distanceY = abs(alienShip.centreY()-player.centreY());
+      if (distanceX< playerCollisionThreshold && distanceY<playerCollisionThreshold) {
+        player.hit();
       }
     }
   }
