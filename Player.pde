@@ -9,7 +9,7 @@ class Player {
   Player() {
     image(playerImage, X, Y);
     imageSequence = new ArrayList<PImage>(); 
-    imageSequence.add(this.defaultImage);  
+    imageSequence.add(this.defaultImage);
   }
 
   void hit() {
@@ -22,8 +22,8 @@ class Player {
     dying=true;
     eventStep=0;
   }
-  
-  PImage currentImage(){
+
+  PImage currentImage() {
     return imageSequence.get(eventStep);
   }
 
@@ -49,12 +49,12 @@ class Player {
       X=X+velocity;
     }
   }
-  
-  void draw(){
+
+  void draw() {
     image(currentImage(), X, Y);
     //Move to next image if there is more than one image in sequence
-    if (imageSequence.size()>1){
-      if (eventStep>=3){
+    if (imageSequence.size()>1) {
+      if (eventStep>=3) {
         //Only event in town is the explosion
         gameScreen="GAMEOVER";
       }

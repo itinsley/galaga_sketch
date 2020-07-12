@@ -1,33 +1,33 @@
-class PlayerController{
+class PlayerController {
   Player player;
   boolean isLeft;
   boolean isRight;
   char directionDefault;
-  
-  PlayerController(Player player){
+
+  PlayerController(Player player) {
     this.player = player;
   }
-  
-  void leftKeyPressed(){
+
+  void leftKeyPressed() {
     isLeft=true;
     directionDefault='r';
   }
-  void leftKeyReleased(){
+  void leftKeyReleased() {
     isLeft=false;
     directionDefault='l';
   }
-  void rightDown(){
-    isRight=true;  
+  void rightDown() {
+    isRight=true;
   }
-  void rightUp(){
+  void rightUp() {
     isRight=false;
   }
-  void move(){
-    if(isLeft && isRight){
-      player.move(directionDefault);    
-    }else if (isLeft && !isRight) {
+  void move() {
+    if (isLeft && isRight) {
+      player.move(directionDefault);
+    } else if (isLeft && !isRight) {
       player.move('l');
-    }else if (!isLeft && isRight) {
+    } else if (!isLeft && isRight) {
       player.move('r');
     }
   }

@@ -33,12 +33,12 @@ void setup() {
   playerExplosionImage4 = loadImage("graphics/galaga-player-ship-explosion-4.png");
   gAlienShips = new ArrayList<AlienShipBase>();
   gAlienShipAttackController = new AlienShipAttackController();
-  
+
   gMinim = new Minim(this);  
   bulletSound = gMinim.loadFile("sound/8d82b5_Galaga_Firing_Sound_Effect.mp3");    
   killSound = gMinim.loadFile("sound/8d82b5_Galaga_Kill_Enemy_Sound_Effect.mp3");
   playerDeathSound = gMinim.loadFile("sound/player-explosion.wav");
-  
+
   size(500, 500);
   frameRate(30);
   initAlienArmy();
@@ -53,7 +53,7 @@ void setup() {
 String gameScreen = "INSTRUCTIONS";
 
 void draw() {
-  
+
   switch(gameScreen) {
   case "INSTRUCTIONS": 
     initScreen();
@@ -83,7 +83,7 @@ void gameScreen() {
 
   playerController.move();
   gPlayer.draw();
-  if (!dying){
+  if (!dying) {
     drawPlayerBullets();
     drawAlienArmy();
     gAlienShipAttackController.GuideAttack(gAlienShips);
@@ -156,7 +156,7 @@ void detectCollision() {
         alienShip.hit();
         gPlayerBullets.remove(gPlayerBullets.get(pbIdx));
         break;
-      }          
+      }
     }
     if (playerBullet !=null && playerBullet.outOfScreen()) {
       gPlayerBullets.remove(gPlayerBullets.get(pbIdx));
@@ -179,13 +179,13 @@ void initAlienArmy() {
   posY = createBatallion(posY, "ATTACK");
 }
 
-int createBatallion(int posY, String shipType){
+int createBatallion(int posY, String shipType) {
   int posXMargin=20;
   int posYMargin = 20;
   for (int row = 1; row <= 3; row++) {
     int posX = posXMargin;
     for (int col = 1; col <= 10; col++) {
-      if (shipType=="DEFAULT"){
+      if (shipType=="DEFAULT") {
         gAlienShips.add(new AlienShip(posX, posY));
       } else {
         gAlienShips.add(new AlienShipAttacker(posX, posY));
@@ -209,7 +209,7 @@ void drawAlienArmy() {
     if (!alienShip.isAlive()) {
       gAlienShips.remove(i);
     }
-        
+
     // ** Hit Player?
     float distanceX = abs(alienShip.centreX()-gPlayer.centreX());
     float distanceY = abs(alienShip.centreY()-gPlayer.centreY());
