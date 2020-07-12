@@ -7,7 +7,7 @@ class AlienShipAttackController {
     }
   }
 
-  public void GuideAttack(ArrayList<AlienShipBase> alienShips) {  
+  public void Guide(ArrayList<AlienShipBase> alienShips) {  
     for (int i = YVectors.size() - 1; i >= 0; i--) {
       if (YVectors.get(i) == alienShips.get(0).Y) {
         float r = random(0, alienShips.size());

@@ -86,7 +86,7 @@ void gameScreen() {
   if (!dying) {
     drawPlayerBullets();
     drawAlienArmy();
-    gAlienShipAttackController.GuideAttack(gAlienShips);
+    gAlienShipAttackController.Guide(gAlienShips);
     movePlayerBullet();
     detectCollision();
   }
