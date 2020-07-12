@@ -17,12 +17,12 @@ ArrayList<PlayerBullet> gPlayerBullets;
 ArrayList<AlienShipBase> gAlienShips;
 Minim gMinim;
 AudioPlayer gAudioPlayer;
-AlienShipAttackController gAlienShipAttackController;
+AlienShipController gAlienShipController;
 
 void setup() {
   loadAssets();
   gAlienShips = new ArrayList<AlienShipBase>();
-  gAlienShipAttackController = new AlienShipAttackController();
+  gAlienShipController = new AlienShipController(gAlienShips);
 
   size(500, 500);
   frameRate(30);
@@ -68,9 +68,8 @@ void gameScreen() {
 
   gPlayerController.guide();
   if (!dying) {
-    drawPlayerBullets();
     drawAlienArmy();
-    gAlienShipAttackController.Guide(gAlienShips);
+    gAlienShipController.guide();
     movePlayerBullet();
     detectCollision();
   }
@@ -159,29 +158,8 @@ void initPlayerBullets() {
 
 /********* ALIENS *********/
 void initAlienArmy() {
-  int posY = createBatallion(200, "DEFAULT");
-  posY = createBatallion(posY, "ATTACK");
-}
-
-int createBatallion(int posY, String shipType) {
-  int posXMargin=20;
-  int posYMargin = 20;
-  for (int row = 1; row <= 3; row++) {
-    int posX = posXMargin;
-    for (int col = 1; col <= 10; col++) {
-      if (shipType=="DEFAULT") {
-        gAlienShips.add(new AlienShip(posX, posY));
-      } else {
-        gAlienShips.add(new AlienShipAttacker(posX, posY));
-      }
-      posX = posX + posXMargin;
-    }
-    posY=posY+posYMargin;
-  }
-  //DEBUG 1 ship
-  //int posX = posXMargin;
-  //alienShips.add(new AlienShip(posX, posY));
-  return posY;
+  int posY = gAlienShipController.createBatallion(200, "DEFAULT");
+  posY = gAlienShipController.createBatallion(posY, "ATTACK");
 }
 
 void drawAlienArmy() {
