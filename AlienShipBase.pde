@@ -71,7 +71,7 @@ class AlienShipBase {
     }
     if (Y>=GROUND_LEVEL_Y){
       if (this.deathOnLanding()==true){
-        player.hit();
+        gPlayer.hit();
       } else {
         isAlive=false;
       }

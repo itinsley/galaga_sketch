@@ -36,8 +36,8 @@ class Player {
   }
 
   void shoot() {
-    if (playerBullets.size()<=BULLETS_LIMIT) {
-      playerBullets.add(new PlayerBullet(X+6, Y-8));
+    if (gPlayerBullets.size()<=BULLETS_LIMIT) {
+      gPlayerBullets.add(new PlayerBullet(X+6, Y-8));
     }
   }
 
