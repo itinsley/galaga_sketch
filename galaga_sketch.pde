@@ -212,11 +212,6 @@ void alienArmyChangeDirection(char direction) {
 void movePlayerBullet() {
   for (PlayerBullet playerBullet : gPlayerBullets) {
     playerBullet.move();
-  }
-}
-
-void drawPlayerBullets() {
-  for (PlayerBullet playerBullet : gPlayerBullets) {
     playerBullet.draw();
   }
 }
