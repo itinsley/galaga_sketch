@@ -4,7 +4,7 @@ class AlienShipController {
 
   AlienShipController(ArrayList<AlienShipBase> alienShips) {
     this.alienShips=alienShips;
-    
+
     //Points at which to attack
     for (int i=200; i<=320; i=i+5) {
       YVectors.add(i);
@@ -25,25 +25,23 @@ class AlienShipController {
   }
 
   public int createBatallion(int posY, String shipType) {
-  int posXMargin=20;
-  int posYMargin = 20;
-  for (int row = 1; row <= 3; row++) {
-    int posX = posXMargin;
-    for (int col = 1; col <= 10; col++) {
-      if (shipType=="DEFAULT") {
-        alienShips.add(new AlienShip(posX, posY));
-      } else {
-        alienShips.add(new AlienShipAttacker(posX, posY));
+    int posXMargin=20;
+    int posYMargin = 20;
+    for (int row = 1; row <= 3; row++) {
+      int posX = posXMargin;
+      for (int col = 1; col <= 10; col++) {
+        if (shipType=="DEFAULT") {
+          alienShips.add(new AlienShip(posX, posY));
+        } else {
+          alienShips.add(new AlienShipAttacker(posX, posY));
+        }
+        posX = posX + posXMargin;
       }
-      posX = posX + posXMargin;
+      posY=posY+posYMargin;
     }
-    posY=posY+posYMargin;
+    //DEBUG 1 ship
+    //int posX = posXMargin;
+    //alienShips.add(new AlienShip(posX, posY));
+    return posY;
   }
-  //DEBUG 1 ship
-  //int posX = posXMargin;
-  //alienShips.add(new AlienShip(posX, posY));
-  return posY;
-}
-
-
 }
