@@ -27,10 +27,11 @@ class AlienShipAttacker extends AlienShipBase {
 
   void attack() {
     if (attackPath==null) {
+      float r = random(0, Y);
       Point origin = new Point(X, Y);
       Point destination = new Point(gPlayer.X, gPlayer.Y);
-      Point leftControl = new Point(gPlayer.X-50, 50);
-      Point rightControl = new Point(gPlayer.X+50, 50);      
+      Point leftControl = new Point(gPlayer.X-50, r);
+      Point rightControl = new Point(gPlayer.X+50, r);      
       attackPath = generateBezierPath(origin, destination, leftControl, rightControl, gPlayer.Y-Y);
       deathOnLanding=false;
     }

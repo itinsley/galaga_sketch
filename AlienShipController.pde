@@ -4,6 +4,8 @@ class AlienShipController {
 
   AlienShipController(ArrayList<AlienShipBase> alienShips) {
     this.alienShips=alienShips;
+    
+    //Points at which to attack
     for (int i=200; i<=320; i=i+5) {
       YVectors.add(i);
     }
