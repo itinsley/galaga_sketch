@@ -106,10 +106,6 @@ void keyPressed() {
     dying=false;
     setup();
   }
-
-  if (key=='x'||key=='X') {
-    ((AlienShipAttacker) gAlienShips.get(50)).attack();
-  }
 }
 
 void keyReleased() {

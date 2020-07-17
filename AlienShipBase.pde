@@ -104,19 +104,3 @@ class AlienShipBase {
     println("Event:"+currentEvent);
   }
 };
-
-
-ArrayList<Point> generateBezierPath(Point origin, Point destination, Point control1, Point control2, int segments) {
-  ArrayList<Point> pointsForReturn = new ArrayList<Point>();
-
-  float t = 0;
-  for (int i = 0; i < segments; i++) {
-    Point p = new Point();
-    p.setX(Math.pow(1 - t, 3) * origin.x + 3.0f * Math.pow(1 - t, 2) * t * control1.x + 3.0f * (1 - t) * t * t * control2.x + t * t * t * destination.x);
-    p.setY(Math.pow(1 - t, 3) * origin.y + 3.0f * Math.pow(1 - t, 2) * t * control1.y + 3.0f * (1 - t) * t * t * control2.y + t * t * t * destination.y);
-    t += 1.0f / segments;
-    pointsForReturn.add(p);
-  }
-  pointsForReturn.add(destination);
-  return pointsForReturn;
-}

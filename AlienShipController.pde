@@ -20,7 +20,7 @@ class AlienShipController {
         float r = random(0, alienShips.size());
         AlienShipBase ship = alienShips.get((int)r);
         if (ship instanceof AlienShipAttacker) {
-          ((AlienShipAttacker) ship).attack();
+          ((AlienShipAttacker) ship).attack(50);
           YVectors.remove(i);
         }
       }
